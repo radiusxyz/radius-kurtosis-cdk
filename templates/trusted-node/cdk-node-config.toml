@@ -1,33 +1,29 @@
 PathRWData = "{{.zkevm_path_rw_data}}"
-L1URL = "{{.l1_rpc_url}}"
-L2URL = "http://{{.l2_rpc_name}}{{.deployment_suffix}}:{{.zkevm_rpc_http_port}}"
-AggLayerURL = "{{.agglayer_url}}"
+L1URL="{{.l1_rpc_url}}"
+L2URL="http://{{.l2_rpc_name}}{{.deployment_suffix}}:{{.zkevm_rpc_http_port}}"
+AggLayerURL="{{.agglayer_url}}"
 
 ForkId = {{.zkevm_rollup_fork_id}}
 IsValidiumMode = {{.is_cdk_validium}}
 
 {{if eq .zkevm_rollup_fork_id "12"}}
-
-{{else if eq .zkevm_rollup_fork_id "13"}}
 ContractVersions = "banana"
-
-
-{{else}}
-
-{{end}}
-
-SequencerPrivateKeyPath = "{{or .zkevm_l2_sequencer_keystore_file "/etc/cdk/sequencer.keystore"}}"
+{{else if eq .zkevm_rollup_fork_id "13"}}
 # Doesn't look like this is needed at the moment, but soon perhaps?
 # ContractVersions = "durian"
 ContractVersions = "banana"
+{{else}}
 ContractVersions = "elderberry"
-L2Coinbase = "{{.zkevm_l2_sequencer_address}}"
-SequencerPrivateKeyPassword = "{{.zkevm_l2_keystore_password}}"
+{{end}}
+
+L2Coinbase =  "{{.zkevm_l2_sequencer_address}}"
+SequencerPrivateKeyPath = "{{or .zkevm_l2_sequencer_keystore_file "/etc/cdk/sequencer.keystore"}}"
+SequencerPrivateKeyPassword  = "{{.zkevm_l2_keystore_password}}"
 
 AggregatorPrivateKeyPath = "{{or .zkevm_l2_aggregator_keystore_file "/etc/cdk/aggregator.keystore"}}"
-AggregatorPrivateKeyPassword = "{{.zkevm_l2_keystore_password}}"
-SenderProofToL1Addr = "{{.zkevm_l2_agglayer_address}}"
-polygonBridgeAddr = "{{.zkevm_bridge_address}}"
+AggregatorPrivateKeyPassword  = "{{.zkevm_l2_keystore_password}}"
+SenderProofToL1Addr = "{{.zkevm_l2_agglayer_address}}"   
+polygonBridgeAddr = "{{.zkevm_bridge_address}}" 
 
 
 RPCURL = "http://{{.l2_rpc_name}}{{.deployment_suffix}}:{{.zkevm_rpc_http_port}}"
@@ -38,19 +34,15 @@ rollupCreationBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
 rollupManagerCreationBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
 genesisBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
 [L1Config]
-chainId = "{{.l1_chain_id}}"
-polygonZkEVMGlobalExitRootAddress = "{{.zkevm_global_exit_root_address}}"
-polygonRollupManagerAddress = "{{.zkevm_rollup_manager_address}}"
-polTokenAddress = "{{.pol_token_address}}"
-polygonZkEVMAddress = "{{.zkevm_rollup_address}}"
-
+	chainId = "{{.l1_chain_id}}"
+	polygonZkEVMGlobalExitRootAddress = "{{.zkevm_global_exit_root_address}}"
+	polygonRollupManagerAddress = "{{.zkevm_rollup_manager_address}}"
+	polTokenAddress = "{{.pol_token_address}}"
+	polygonZkEVMAddress = "{{.zkevm_rollup_address}}"
+	
 [L2Config]
-GlobalExitRootAddr = "{{.zkevm_global_exit_root_address}}"
+	GlobalExitRootAddr = "{{.zkevm_global_exit_root_address}}"
 
-[Log]
-Environment = "development"     # "production" or "development"
-Level = "{{.global_log_level}}"
-Outputs = ["stderr"]
 
 [SequenceSender.AvailDAConfig]
 seed = ""
@@ -60,21 +52,26 @@ bridge_api_url = "https://turing-bridge-api.fra.avail.so"
 app_id = "23"
 timeout = "2000s"
 
-[Aggregator]
-Port = "{{.zkevm_aggregator_port}}"
-RetryTime = "30s"
-VerifyProofInterval = "10s"
-GasOffset = 150000
-SettlementBackend = "agglayer"
-[Aggregator.DB]
-Name = "{{.aggregator_db.name}}"
-User = "{{.aggregator_db.user}}"
-Password = "{{.aggregator_db.password}}"
-Host = "{{.aggregator_db.hostname}}"
-Port = "{{.aggregator_db.port}}"
-EnableLog = false
-MaxConns = 200
+[Log]
+Environment = "development" # "production" or "development"
+Level = "{{.global_log_level}}"
+Outputs = ["stderr"]
 
+[Aggregator]
+        Port = "{{.zkevm_aggregator_port}}"
+        RetryTime = "30s"
+        VerifyProofInterval = "10s"
+        GasOffset = 150000
+        SettlementBackend = "agglayer"
+        [Aggregator.DB]
+                Name = "{{.aggregator_db.name}}"
+                User = "{{.aggregator_db.user}}"
+                Password = "{{.aggregator_db.password}}"
+                Host = "{{.aggregator_db.hostname}}"
+                Port = "{{.aggregator_db.port}}"
+                EnableLog = false
+                MaxConns = 200
+       
 [AggSender]
 CertificateSendInterval = "1m"
 CheckSettledInterval = "5s"
