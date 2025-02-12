@@ -9,7 +9,7 @@ IsValidiumMode = {{.is_cdk_validium}}
 {{if eq .zkevm_rollup_fork_id "12"}}
 
 {{else if eq .zkevm_rollup_fork_id "13"}}
-
+ContractVersions = "banana"
 
 
 {{else}}
@@ -17,13 +17,10 @@ IsValidiumMode = {{.is_cdk_validium}}
 {{end}}
 
 SequencerPrivateKeyPath = "{{or .zkevm_l2_sequencer_keystore_file "/etc/cdk/sequencer.keystore"}}"
-ContractVersions = "banana"
 # Doesn't look like this is needed at the moment, but soon perhaps?
 # ContractVersions = "durian"
 ContractVersions = "banana"
 ContractVersions = "elderberry"
-L2Coinbase = "{{.zkevm_l2_sequencer_address}}"
-ContractVersions = "{{.zkevm_rollup_fork_name}}"
 L2Coinbase = "{{.zkevm_l2_sequencer_address}}"
 SequencerPrivateKeyPassword = "{{.zkevm_l2_keystore_password}}"
 
@@ -40,7 +37,6 @@ WitnessURL = "http://{{.l2_rpc_name}}{{.deployment_suffix}}:{{.zkevm_rpc_http_po
 rollupCreationBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
 rollupManagerCreationBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
 genesisBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
-
 [L1Config]
 chainId = "{{.l1_chain_id}}"
 polygonZkEVMGlobalExitRootAddress = "{{.zkevm_global_exit_root_address}}"
@@ -51,6 +47,11 @@ polygonZkEVMAddress = "{{.zkevm_rollup_address}}"
 [L2Config]
 GlobalExitRootAddr = "{{.zkevm_global_exit_root_address}}"
 
+[Log]
+Environment = "development"     # "production" or "development"
+Level = "{{.global_log_level}}"
+Outputs = ["stderr"]
+
 [SequenceSender.AvailDAConfig]
 seed = ""
 ws_api_url = "wss://turing-rpc.avail.so/ws"
@@ -58,11 +59,6 @@ http_api_url = "https://turing-indexer.avail.so"
 bridge_api_url = "https://turing-bridge-api.fra.avail.so"
 app_id = "23"
 timeout = "2000s"
-
-[Log]
-Environment = "development"     # "production" or "development"
-Level = "{{.global_log_level}}"
-Outputs = ["stderr"]
 
 [Aggregator]
 Port = "{{.zkevm_aggregator_port}}"
@@ -80,8 +76,5 @@ EnableLog = false
 MaxConns = 200
 
 [AggSender]
-
-
-# The initial block number from which to start syncing.CertificateSendInterval = "1m"
+CertificateSendInterval = "1m"
 CheckSettledInterval = "5s"
-# Default: 0
