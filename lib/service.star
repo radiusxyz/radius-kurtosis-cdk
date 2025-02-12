@@ -15,8 +15,8 @@ def get_contract_setup_addresses(plan, args):
     }
     if data_availability_package.is_cdk_validium(args):
         extract[
-            "polygon_data_committee_address"
-        ] = "fromjson | .polygonDataCommitteeAddress"
+            "avail_attestation_address"
+        ] = "fromjson | .availAttestationAddress"
 
     exec_recipe = ExecRecipe(
         command=["/bin/sh", "-c", "cat /opt/zkevm/combined.json"],

@@ -59,7 +59,7 @@ def run(plan, args={}):
         "zkevm_rollup_manager_address" in args
         and "zkevm_rollup_manager_block_number" in args
         and "zkevm_global_exit_root_l2_address" in args
-        and "polygon_data_committee_address" in args
+        and "avail_attestation_address" in args
     ):
         plan.print("Deploying helper service to retrieve rollup data")
         deploy_helper_service(plan, args)

@@ -24,6 +24,7 @@ WitnessURL = "http://{{.l2_rpc_name}}{{.deployment_suffix}}:{{.zkevm_rpc_http_po
 rollupCreationBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
 rollupManagerCreationBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
 genesisBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
+
 [L1Config]
 chainId = "{{.l1_chain_id}}"
 polygonZkEVMGlobalExitRootAddress = "{{.zkevm_global_exit_root_address}}"
@@ -34,13 +35,14 @@ polygonZkEVMAddress = "{{.zkevm_rollup_address}}"
 [L2Config]
 GlobalExitRootAddr = "{{.zkevm_global_exit_root_address}}"
 
-[AvailDAConfig]
+[SequenceSender.AvailDAConfig]
 seed = ""
 ws_api_url = "wss://turing-rpc.avail.so/ws"
 http_api_url = "https://turing-indexer.avail.so"
 bridge_api_url = "https://turing-bridge-api.fra.avail.so"
 app_id = "23"
 timeout = "2000s"
+
 [Log]
 Environment = "development"     # "production" or "development"
 Level = "{{.global_log_level}}"
