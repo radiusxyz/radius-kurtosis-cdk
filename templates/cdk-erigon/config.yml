@@ -346,7 +346,7 @@ zkevm.use-tx-orderer: true
 
 zkevm.max-sbb-finalization-capacity: 10
 
-zkevm.rollup-id: radius-rollup
+zkevm.rollup-id: radius_rollup
 
 zkevm.platform: ethereum
 
