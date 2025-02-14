@@ -31,7 +31,7 @@ fi
 
 SOURCE_FORKID=$1
 TARGET_FORKID=$2
-ERIGON_IMAGE=hermeznetwork/cdk-erigon:v2.61.4-RC1
+ERIGON_IMAGE=theradius/radius-cdk-erigon:latest
 STACK_NAME=upgradeCDK-$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13; echo)
 
 if [ "$TARGET_FORKID" -eq "11" ]; then
