@@ -346,17 +346,17 @@ zkevm.use-tx-orderer: true
 
 zkevm.max-sbb-finalization-capacity: 10
 
-zkevm.rollup-id: radius_rollup
+zkevm.rollup-id: radius_rollup_sign
 
 zkevm.platform: ethereum
 
 zkevm.platform-url: https://ethereum-holesky-rpc.publicnode.com
 
-zkevm.liveness-contract-address: 0xBE32Ae8d955747FD4Ab0818C927c3926F373E05E
+zkevm.liveness-contract-address: 0xC8AC56E90cA3F22A45eEC37cb0dDEB5c2202C71D
 
 zkevm.service-type: radius
 
-zkevm.cluster-id: radius_test
+zkevm.cluster-id: radius_tx_orderer_test
 
 zkevm.seed-node-url: http://34.64.51.210:6000
 
