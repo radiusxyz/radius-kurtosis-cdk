@@ -350,8 +350,8 @@ zkevm.rollup-id: radius_rollup_sign
 
 zkevm.platform: ethereum
 
-#zkevm.platform-url: https://ethereum-holesky-rpc.publicnode.com
-zkevm.platform-url: https://holesky.infura.io/v3/c3367c2bd73d4053804e08bc1a64d281
+zkevm.platform-url: https://ethereum-holesky-rpc.publicnode.com
+#zkevm.platform-url: https://holesky.infura.io/v3/c3367c2bd73d4053804e08bc1a64d281
 
 zkevm.liveness-contract-address: 0xC8AC56E90cA3F22A45eEC37cb0dDEB5c2202C71D
 
