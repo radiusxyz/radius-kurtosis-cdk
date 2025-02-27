@@ -63,11 +63,11 @@ def get_cdk_node_ports(args):
 
     # FEP requires the aggregator
     ports = {
-        # "aggregator": PortSpec(
-        #     args["zkevm_aggregator_port"],
-        #     application_protocol="grpc",
-        #     wait=aggregator_wait,
-        # ),
+        "aggregator": PortSpec(
+            args["zkevm_aggregator_port"],
+            application_protocol="grpc",
+            wait=aggregator_wait,
+        ),
         "rpc": PortSpec(
             args["zkevm_cdk_node_port"],
             application_protocol="http",
@@ -84,7 +84,7 @@ def get_cdk_node_cmd(args):
         "sleep 20 && cdk-node run "
         + "--cfg=/etc/cdk/cdk-node-config.toml "
         + "--custom-network-file=/etc/cdk/genesis.json "
-        + "--components=sequence-sender"
+        + "--components=sequence-sender,aggregator"
     ]
 
     if args["consensus_contract_type"] == "pessimistic":
