@@ -346,7 +346,8 @@ zkevm.use-tx-orderer: true
 
 zkevm.max-sbb-finalization-capacity: 10
 
-zkevm.rollup-id: radius_rollup_sign
+#zkevm.rollup-id: radius_rollup_sign
+zkevm.rollup-id: rollup_id_2
 
 zkevm.platform: ethereum
 
@@ -358,7 +359,8 @@ zkevm.liveness-contract-address: 0xa2F0899c8EE2C5950bAaE23362BB9a3A0aae6149
 
 zkevm.service-type: radius
 
-zkevm.cluster-id: radius_tx_orderer_test
+#zkevm.cluster-id: radius_tx_orderer_test
+zkevm.cluster-id: radius
 
 zkevm.seed-node-url: http://34.64.51.210:6000
 
