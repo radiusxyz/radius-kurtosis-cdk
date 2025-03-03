@@ -46,11 +46,11 @@ genesisBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
 
 [SequenceSender.AvailDAConfig]
         seed = ""
-        ws_api_url = "wss://rpc-hex-devnet.avail.tools/ws"
-        http_api_url = "https://rpc-hex-devnet.avail.tools/rpc"
-        bridge_api_url = "https://hex-bridge-api.sandbox.avail.tools"
-        app_id = 19
-        timeout = 2000
+        ws_api_url = "wss://turing-rpc.avail.so/ws"
+        http_api_url = "https://turing-indexer.avail.so"
+        bridge_api_url = "https://turing-bridge-api.fra.avail.so"
+        app_id = 0
+        timeout = 10000
 
 [Log]
 Environment = "development" # "production" or "development"
@@ -74,11 +74,11 @@ Outputs = ["stderr"]
 
         [Aggregator.Synchronizer.Etherman.AvailDAConfig]
                 seed = ""
-                ws_api_url = "wss://rpc-hex-devnet.avail.tools/ws"
-                http_api_url = "https://rpc-hex-devnet.avail.tools/rpc"
-                bridge_api_url = "https://hex-bridge-api.sandbox.avail.tools"
-                app_id = 19
-                timeout = 2000
+                ws_api_url = "wss://turing-rpc.avail.so/ws"
+                http_api_url = "https://turing-indexer.avail.so"
+                bridge_api_url = "https://turing-bridge-api.fra.avail.so"
+                app_id = 0
+                timeout = 10000
        
 [AggSender]
 CertificateSendInterval = "1m"
