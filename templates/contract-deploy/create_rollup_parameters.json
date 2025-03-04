@@ -3,7 +3,7 @@
     "chainID": {{.zkevm_rollup_chain_id}},
     "consensusContract": "{{.zkevm_rollup_consensus}}",
     "dataAvailabilityProtocol": "AvailDA",
-    "availBridgeAddress": "0x0000000000000000000000000000000000000000",
+    "availBridgeAddress": "0x967F7DdC4ec508462231849AE81eeaa68Ad01389",
     "deployerPvtKey": "{{.zkevm_l2_admin_private_key}}",
     "description": "kurtosis-devnet - {{.chain_name}}",
     "forkID": {{.zkevm_rollup_fork_id}},
