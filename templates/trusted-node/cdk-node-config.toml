@@ -50,7 +50,7 @@ genesisBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
         http_api_url = "https://turing-indexer.avail.so"
         bridge_api_url = "https://turing-bridge-api.fra.avail.so"
         app_id = 0
-        timeout = 10000
+        timeout = 1200
 
 [Log]
 Environment = "development" # "production" or "development"
@@ -78,7 +78,7 @@ Outputs = ["stderr"]
                 http_api_url = "https://turing-indexer.avail.so"
                 bridge_api_url = "https://turing-bridge-api.fra.avail.so"
                 app_id = 0
-                timeout = 10000
+                timeout = 1200
        
 [AggSender]
 CertificateSendInterval = "1m"
