@@ -342,7 +342,7 @@ zkevm.allow-free-transactions: false
 # Default: false
 zkevm.allow-pre-eip155-transactions: true
 
-zkevm.use-tx-orderer: true
+zkevm.use-tx-orderer: false
 
 zkevm.max-sbb-finalization-capacity: 10
 
