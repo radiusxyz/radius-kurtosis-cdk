@@ -1,7 +1,7 @@
 PathRWData = "{{.zkevm_path_rw_data}}"
 L1URL="{{.l1_rpc_url}}"
 L2URL="http://{{.l2_rpc_name}}{{.deployment_suffix}}:{{.zkevm_rpc_http_port}}"
-AggLayerURL="{{.agglayer_url}}"
+AggLayerURL="{{.agglayer_readrpc_url}}"
 
 ForkId = {{.zkevm_rollup_fork_id}}
 IsValidiumMode = {{.is_cdk_validium}}
@@ -41,7 +41,7 @@ genesisBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
 	polygonZkEVMAddress = "{{.zkevm_rollup_address}}"
 	
 [L2Config]
-	GlobalExitRootAddr = "{{.zkevm_global_exit_root_address}}"
+	GlobalExitRootAddr = "{{.zkevm_global_exit_root_l2_address}}"
 
 
 [SequenceSender.AvailDAConfig]

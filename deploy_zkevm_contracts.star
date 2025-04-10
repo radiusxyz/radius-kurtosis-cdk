@@ -1,5 +1,6 @@
 data_availability_package = import_module("./lib/data_availability.star")
 
+
 ARTIFACTS = [
     {
         "name": "deploy_parameters.json",
@@ -29,6 +30,30 @@ ARTIFACTS = [
         "name": "run-sovereign-setup.sh",
         "file": "./templates/sovereign-rollup/run-sovereign-setup.sh",
     },
+    {
+        "name": "create_new_rollup.json",
+        "file": "./templates/sovereign-rollup/create_new_rollup.json",
+    },
+    {
+        "name": "add_rollup_type.json",
+        "file": "./templates/sovereign-rollup/add_rollup_type.json",
+    },
+    {
+        "name": "sovereign-genesis.json",
+        "file": "./templates/sovereign-rollup/genesis.json",
+    },
+    {
+        "name": "create-genesis-sovereign-params.json",
+        "file": "./templates/sovereign-rollup/create-genesis-sovereign-params.json",
+    },
+    {
+        "name": "create-predeployed-sovereign-genesis.sh",
+        "file": "./templates/sovereign-rollup/create-predeployed-sovereign-genesis.sh",
+    },
+    {
+        "name": "op-original-genesis.json",
+        "file": "./templates/sovereign-rollup/op-original-genesis.json",
+    },
 ]
 
 
@@ -36,10 +61,7 @@ def run(plan, args):
     artifact_paths = list(ARTIFACTS)
     # If we are configured to use a previous deployment, we'll
     # dynamically add artifacts for the genesis and combined outputs.
-    if (
-        "use_previously_deployed_contracts" in args
-        and args["use_previously_deployed_contracts"]
-    ):
+    if args.get("use_previously_deployed_contracts"):
         artifact_paths.append(
             {
                 "name": "genesis.json",
@@ -158,7 +180,7 @@ def run(plan, args):
 
     # Force update GER.
     plan.exec(
-        description="Update the GER so the L1 Info Tree Index is greater than 0",
+        description="Updating the GER so the L1 Info Tree Index is greater than 0",
         service_name=contracts_service_name,
         recipe=ExecRecipe(
             command=[
