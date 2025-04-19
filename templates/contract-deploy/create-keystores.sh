@@ -11,10 +11,8 @@ create_geth_keystore() {
     temp_dir="/tmp/$keystore_name"
     output_dir="/opt/zkevm"
     mkdir -p "$temp_dir"
-    polycli parseethwallet --hexkey "$private_key" --password "$password" --keystore "$temp_dir"
-    mv "$temp_dir"/UTC* "$output_dir/$keystore_name"
-    jq < "$output_dir/$keystore_name" > "$output_dir/$keystore_name.new"
-    mv "$output_dir/$keystore_name.new" "$output_dir/$keystore_name"
+    cast wallet import --keystore-dir "$temp_dir" --private-key "$private_key" --unsafe-password "$password" "$keystore_name"
+    jq < "$temp_dir/$keystore_name" > "$output_dir/$keystore_name"
     chmod a+r "$output_dir/$keystore_name"
     rm -rf "$temp_dir"
 }
@@ -28,4 +26,3 @@ create_geth_keystore "proofsigner.keystore"     "{{.zkevm_l2_proofsigner_private
 create_geth_keystore "claimsponsor.keystore"    "{{.zkevm_l2_claimsponsor_private_key}}"    "{{.zkevm_l2_keystore_password}}"
 create_geth_keystore "aggoracle.keystore"       "{{.zkevm_l2_aggoracle_private_key}}"       "{{.zkevm_l2_keystore_password}}"
 create_geth_keystore "sovereignadmin.keystore"  "{{.zkevm_l2_sovereignadmin_private_key}}"  "{{.zkevm_l2_keystore_password}}"
-create_geth_keystore "claimtx.keystore"         "{{.zkevm_l2_claimtx_private_key}}"         "{{.zkevm_l2_keystore_password}}"

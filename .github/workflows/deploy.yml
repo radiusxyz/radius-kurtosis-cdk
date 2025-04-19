@@ -13,13 +13,13 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  POLYCLI_VERSION: v0.1.67 # https://github.com/0xPolygon/polygon-cli/releases/
+  POLYCLI_VERSION: v0.1.72 # https://github.com/0xPolygon/polygon-cli/releases/
   ENCLAVE_NAME: cdk
 
 jobs:
   run-without-args:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -44,24 +44,19 @@ jobs:
       - name: Inspect enclave
         run: kurtosis enclave inspect ${{ env.ENCLAVE_NAME }}
 
-      - name: List databases
-        run: |
-          postgres_port=$(kurtosis port print ${{ env.ENCLAVE_NAME }} postgres-001 postgres | cut -d':' -f3)
-          PGPASSWORD=master_password psql --host 127.0.0.1 --port "$postgres_port" --username master_user --dbname master --list
-
-      - name: Monitor CDK chain verified batches (CDK Erigon Permissionless RPC)
+      - name: Monitor pessimistic consensus chain (CDK Erigon Permissionless RPC)
         working-directory: .github/scripts
         run: |
-          ./monitor-cdk-chain.sh \
+          ./monitor-pessimistic-chain.sh \
             --enclave ${{ env.ENCLAVE_NAME }} \
             --rpc-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-001 rpc)
 
       - name: Dump enclave
-        if: ${{ !cancelled() }}
+        if: always()
         run: kurtosis enclave dump ${{ env.ENCLAVE_NAME }} ./dump
 
       - name: Upload enclave dump
-        if: ${{ !cancelled() }}
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dump_run_without_args_${{ github.run_id }}
@@ -69,7 +64,7 @@ jobs:
 
   list-ymls:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 2
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -80,26 +75,24 @@ jobs:
         run: ./combine-ymls.sh
 
       - id: set-matrix
-        # List all yml files in the .github/tests directory, as well as test combinations, except for the additional-services.yml file.
         run: |
-          files=$(ls -R \
-            ./.github/tests/combinations/*.yml \
-            ./.github/tests/gas-token/auto.yml \
-            ./.github/tests/static-ports/custom-static-ports.yml \
-            ./.github/tests/static-ports/default-static-ports.yml \
-            ./.github/tests/op-rollup/*.yml \
-            | grep -v 'additional-services.yml')
-          matrix=$(echo "$files" | jq -R -s -c 'split("\n")[:-1]')
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          # Only run a subset of the tests in CI.
+          file_paths=$(ls -R ./.github/tests/combinations/*.yml ./.github/tests/nightly/op-rollup/op-default.yml)
+          matrix=$(echo "${file_paths}" | while read -r file_path; do
+            file_name=$(basename -s ".yml" "$file_path")
+            echo "{\"name\": \"$file_name\", \"path\": \"$file_path\"}"
+          done | jq -s -c '.')
+          echo "matrix=${matrix}" >> $GITHUB_OUTPUT
 
   run-with-args:
     needs: list-ymls
+    name: run-with-${{ matrix.file.name }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        file_name: ${{ fromJson(needs.list-ymls.outputs.matrix) }}
+        file: ${{ fromJson(needs.list-ymls.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -118,41 +111,19 @@ jobs:
       - name: Install Kurtosis CDK tools
         uses: ./.github/actions/setup-kurtosis-cdk
 
-      - name: Generate test combinations
-        working-directory: .github/tests
-        run: ./combine-ymls.sh
-
       - name: Run Starlark
-        run: kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=${{ matrix.file_name }} --show-enclave-inspect=false .
+        run: kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=${{ matrix.file.path }} --show-enclave-inspect=false .
 
       - name: Inspect enclave
         run: kurtosis enclave inspect ${{ env.ENCLAVE_NAME }}
 
-      - name: Verify static ports
+      - name: Monitor pessimistic chain virtual batches (Central RPC)
         run: |
-          if [[ ${{ matrix.file_name }} == "./.github/tests/static-ports/default-static-ports.yml" ]]; then
-            echo "Making sure public ports start by a 5 as defined by the static ports in the input_parser.star file."
-
-            ports=$(kurtosis enclave inspect ${{ env.ENCLAVE_NAME }} | sed -n '/^========================================== User Services ==========================================$/,$ p' | tail -n +3)
-            if ! wrong_ports=$(echo "$ports" | grep -vE '127.0.0.1:5|none'); then
-              echo "✅ Default static ports are set correctly."
-              exit 0
-            else
-              echo "wrong_ports: $wrong_ports"
-              echo "❌ Default static ports are not set correctly."
-              exit 1
-            fi
-          else
-            echo "Skipping."
-          fi
-
-      - name: Monitor CDK chain verified batches (Central RPC)
-        run: |
-          result=$(yq --raw-output '.args.consensus_contract_type' ${{ matrix.file_name }})
+          result=$(yq --raw-output '.args.consensus_contract_type' ${{ matrix.file.path }})
           if [[ "$result" == "pessimistic" ]]; then
             echo "Skipping block verification as consensus is pessimistic."
           else
-            sequencer_type=$(yq --raw-output '.args.sequencer_type' ${{ matrix.file_name }})
+            sequencer_type=$(yq --raw-output '.args.sequencer_type' ${{ matrix.file.path }})
             rpc_name=""
             if [[ "$sequencer_type" == "erigon" ]]; then
               rpc_name="cdk-erigon-rpc-001"
@@ -165,18 +136,18 @@ jobs:
               exit 1
             fi
             echo "RPC name: $rpc_name"
-            ./.github/scripts/monitor-cdk-chain.sh \
+            ./.github/scripts/monitor-pessimistic-chain.sh \
               --enclave ${{ env.ENCLAVE_NAME }} \
               --rpc-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} $rpc_name rpc)
           fi
 
       - name: Monitor CDK chain verified batches (zkEVM Permissionless RPC)
         run: |
-          result=$(yq --raw-output '.args.consensus_contract_type' ${{ matrix.file_name }})
+          result=$(yq --raw-output '.args.consensus_contract_type' ${{ matrix.file.path }})
           if [[ "$result" == "pessimistic" ]]; then
             echo "Skipping block verification as consensus is pessimistic."
           else
-            result=$(yq --raw-output '.args.additional_services // [] | contains(["pless_zkevm_node"])' ${{ matrix.file_name }})
+            result=$(yq --raw-output '.args.additional_services // [] | contains(["pless_zkevm_node"])' ${{ matrix.file.path }})
             if [[ "$result" == "true" ]]; then
               ./.github/scripts/monitor-cdk-chain.sh \
                 --enclave ${{ env.ENCLAVE_NAME }} \
@@ -188,116 +159,36 @@ jobs:
 
       - name: Monitor OP rollup finalized blocks (OP CL RPC)
         run: |
-          result=$(yq --raw-output '.deployment_stages.deploy_optimism_rollup' ${{ matrix.file_name }})
+          result=$(yq --raw-output '.deployment_stages.deploy_optimism_rollup' ${{ matrix.file.path }})
           if [[ "$result" == "true" ]]; then
             ./.github/scripts/monitor-op-rollup.sh \
               --enclave ${{ env.ENCLAVE_NAME }} \
-              --cl-rpc-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} op-cl-1-op-node-op-geth-op-kurtosis http)
+              --cl-rpc-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} op-cl-1-op-node-op-geth-001 http)
           else
             echo "Skipping block verification as there is no OP rollup in the environment"
           fi
 
       - name: Dump enclave
-        if: ${{ !cancelled() }}
+        if: always()
         run: kurtosis enclave dump ${{ env.ENCLAVE_NAME }} ./dump
 
       - name: Generate archive name
-        if: ${{ !cancelled() }}
+        if: always()
         run: |
-          file_name=$(basename "${{ matrix.file_name }}" ".yml")
-          archive_name="dump_run_with_args_${file_name}_${{ github.run_id }}"
+          archive_name="dump_run_with_args_${{ matrix.file.name }}_${{ github.run_id }}"
           echo "ARCHIVE_NAME=${archive_name}" >> "$GITHUB_ENV"
           echo "Generated archive name: ${archive_name}"
 
       - name: Upload enclave dump
-        if: ${{ !cancelled() }}
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARCHIVE_NAME }}
           path: ./dump
 
-  pre-deployed-gas-token:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        # This step will only execute if the necessary secrets are available, preventing failures
-        # on pull requests from forked repositories.
-        if: ${{ env.DOCKERHUB_USERNAME && env.DOCKERHUB_TOKEN }}
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Install Kurtosis CDK tools
-        uses: ./.github/actions/setup-kurtosis-cdk
-
-      - name: Deploy L1 chain
-        run: kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=./.github/tests/external-l1/deploy-local-l1.yml .
-
-      - name: Deploy gas token on L1
-        run: |
-          zkevm_contracts_version="v8.0.0-rc.4-fork.12"
-          echo "Cloning zkevm-contracts $zkevm_contracts_version..."
-          git clone https://github.com/0xPolygonHermez/zkevm-contracts
-          pushd zkevm-contracts
-          git checkout $zkevm_contracts_version
-          npm install @openzeppelin/contracts@4.8.2
-          printf "[profile.default]\nsrc = 'contracts'\nout = 'out'\nlibs = ['node_modules']\n" > foundry.toml
-
-          echo "Deploying gas token to L1..."
-          l1_rpc_url=$(kurtosis port print ${{ env.ENCLAVE_NAME }} el-1-geth-lighthouse rpc)
-          forge create \
-            --broadcast \
-            --json \
-            --rpc-url $l1_rpc_url \
-            --mnemonic "giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete" \
-            contracts/mocks/ERC20PermitMock.sol:ERC20PermitMock \
-            --constructor-args "CDK Gas Token" "CDK" "0xE34aaF64b29273B7D567FCFc40544c014EEe9970" "1000000000000000000000000" \
-            > gasToken-erc20.json
-          gas_token_address=$(jq --raw-output '.deployedTo' gasToken-erc20.json)
-          if [[ -z "$gas_token_address" || "$gas_token_address" == "null" ]]; then
-            echo "Unable to deploy gas token"
-            exit 1
-          fi
-          echo "Gas token contract deployed at $gas_token_address on L1"
-          popd
-          yq -Y --in-place ".args.gas_token_address = \"$gas_token_address\"" ./.github/tests/gas-token/pre-deployed.yml
-
-      - name: Deploy the rest of the stack
-        run: |
-          yq -Y --in-place ".deployment_stages.deploy_l1 = false" ./.github/tests/gas-token/pre-deployed.yml
-          kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=./.github/tests/gas-token/pre-deployed.yml .
-
-      - name: Inspect enclave
-        run: kurtosis enclave inspect ${{ env.ENCLAVE_NAME }}
-
-      - name: Monitor CDK chain verified batches (CDK Erigon Permissionless RPC)
-        working-directory: .github/scripts
-        run: |
-          ./monitor-cdk-chain.sh \
-            --enclave ${{ env.ENCLAVE_NAME }} \
-            --rpc-url "$(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-001 rpc)"
-
-      - name: Dump enclave
-        if: ${{ !cancelled() }}
-        run: kurtosis enclave dump ${{ env.ENCLAVE_NAME }} ./dump
-
-      - name: Upload enclave dump
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: dump_pre_deployed_gas_token${{ github.run_id }}
-          path: ./dump
-
   additional-services:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -322,10 +213,10 @@ jobs:
       - name: Inspect enclave
         run: kurtosis enclave inspect ${{ env.ENCLAVE_NAME }}
 
-      - name: Monitor CDK chain verified batches (CDK Erigon Permissionless RPC)
+      - name: Monitor pessimistic chain virtual batches (CDK Erigon Permissionless RPC)
         working-directory: .github/scripts
         run: |
-          ./monitor-cdk-chain.sh \
+          ./monitor-pessimistic-chain.sh \
             --enclave ${{ env.ENCLAVE_NAME }} \
             --rpc-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-001 rpc)
 
@@ -388,217 +279,17 @@ jobs:
           fi
 
       - name: Dump enclave
-        if: ${{ !cancelled() }}
+        if: always()
         run: kurtosis enclave dump ${{ env.ENCLAVE_NAME }} ./dump
 
       - name: Upload enclave dump
-        if: ${{ !cancelled() }}
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dump_additional_services_${{ github.run_id }}
           path: ./dump
 
-  attach-additional-cdks:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        # This step will only execute if the necessary secrets are available, preventing failures
-        # on pull requests from forked repositories.
-        if: ${{ env.DOCKERHUB_USERNAME && env.DOCKERHUB_TOKEN }}
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Install polycli
-        run: |
-          tmp_dir=$(mktemp -d) 
-          curl -L "https://github.com/0xPolygon/polygon-cli/releases/download/${{ env.POLYCLI_VERSION }}/polycli_${{ env.POLYCLI_VERSION }}_linux_amd64.tar.gz" | tar -xz -C "$tmp_dir" 
-          mv "$tmp_dir"/* /usr/local/bin/polycli 
-          rm -rf "$tmp_dir"
-          sudo chmod +x /usr/local/bin/polycli
-          /usr/local/bin/polycli version
-
-      - name: Install Kurtosis CDK tools
-        uses: ./.github/actions/setup-kurtosis-cdk
-
-      # Step to handle when the SP1_PRIVATE_KEY secret is available.
-      - name: Replace Agglayer SP1 Prover Key with Github Secrets
-        run: |
-          sed -i "s/agglayer_prover_sp1_key: null/agglayer_prover_sp1_key: \"${{ secrets.SP1_PRIVATE_KEY }}\"/" ./.github/tests/agglayer-sp1-key.yml
-        # This step will only execute if the necessary secrets are available, preventing failures
-        # on pull requests from forked repositories.
-        if: ${{ env.agglayer_prover_sp1_key && env.agglayer_prover_sp1_key != '' }}
-        env :
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-      - name: Deploy L1 chain and a first CDK L2 chain (cdk-erigon sequencer + cdk stack)
-        run: kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=./.github/tests/agglayer-sp1-key.yml .
-
-      - name: Update the agglayer config
-        run: |
-          # Download the agglayer config file.
-          kurtosis files download ${{ env.ENCLAVE_NAME }} agglayer-config-artifact
-          cd agglayer-config-artifact
-          # Update the config by adding the rpc and proof signer of the second chain.
-          tomlq -Y --toml-output --in-place '."full-node-rpcs" += {"2": "http://cdk-erigon-rpc-002:8123"}' agglayer-config.toml
-          # Update the config by adding the rpc and proof signer of the third chain.
-          tomlq -Y --toml-output --in-place '."full-node-rpcs" += {"3": "http://cdk-erigon-rpc-003:8123"}' agglayer-config.toml
-          # Replace the agglayer config.
-          agglayer_container_id="$(docker ps --filter name=agglayer --format json | jq -r -s '. | map(select(.Names | startswith("agglayer--"))) | .[].ID')"
-          docker cp agglayer-config.toml "$agglayer_container_id:/etc/zkevm/agglayer-config.toml"
-          # Restart the agglayer service.
-          kurtosis service stop ${{ env.ENCLAVE_NAME }} agglayer
-          kurtosis service start ${{ env.ENCLAVE_NAME }} agglayer
-
-      - name: Attach a second FEP CDK L2 chain (cdk-erigon sequencer + cdk FEP stack)
-        run: kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=./.github/tests/attach-second-cdk.yml .
-
-      # Only run this step if the SP1_PRIVATE_KEY secrets is available.
-      - name: Attach a third PP CDK L2 chain (cdk-erigon sequencer + cdk PP stack)
-        if: ${{ env.agglayer_prover_sp1_key || env.agglayer_prover_sp1_key != '' }}
-        run: |
-          kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=./.github/tests/attach-third-cdk.yml .
-        env:
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-      # Only run this step if the SP1_PRIVATE_KEY secrets is available.
-      - name: Restart the Erigon RPC of the PP network
-        if: ${{ env.agglayer_prover_sp1_key || env.agglayer_prover_sp1_key != '' }}
-        run: |
-          kurtosis service stop ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-003
-          kurtosis service start ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-003
-        env:
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-      - name: Inspect enclave
-        run: kurtosis enclave inspect ${{ env.ENCLAVE_NAME }}
-
-      # - name: Monitor CDK chain 1 verified batches (CDK Erigon Permissionless RPC)
-      #   working-directory: .github/scripts
-      #   run: |
-      #     ./monitor-cdk-chain.sh \
-      #       --enclave ${{ env.ENCLAVE_NAME }} \
-      #       --rpc-url "$(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-001 rpc)"
-
-      - name: Monitor CDK chain 2 verified batches (CDK Erigon Permissionless RPC)
-        working-directory: .github/scripts
-        run: |
-          ./monitor-cdk-chain.sh \
-            --enclave ${{ env.ENCLAVE_NAME }} \
-            --rpc-url "$(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-002 rpc)"
-
-      - name: Send bridge transactions from L1 to the third PP L2 chain
-        if: ${{ env.agglayer_prover_sp1_key || env.agglayer_prover_sp1_key != '' }}
-        working-directory: .github/scripts
-        run: |
-          echo "Sending a bridge transaction from L1 to the PP network Erigon RPC..."
-          bridge_address=$(kurtosis service exec ${{ env.ENCLAVE_NAME }} contracts-001 'jq -r .polygonZkEVMBridgeAddress /opt/zkevm/combined.json' 2>&1 | grep -P '0x\h*')
-          originNetworkURL=$(kurtosis port print ${{ env.ENCLAVE_NAME }} el-1-geth-lighthouse rpc)
-          polycli ulxly bridge asset \
-              --private-key 12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625 \
-              --value 1000000000000000000 \
-              --rpc-url http://$originNetworkURL \
-              --bridge-address $bridge_address \
-              --destination-network 3 \
-              --force-update-root=true \
-              --destination-address 0xE34aaF64b29273B7D567FCFc40544c014EEe9970
-          if [[ $ret_code -eq 0 ]]; then
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Exiting... Deposit Transaction successfuly sent!"
-          else
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Exiting... Deposit Transaction failed!"
-              exit 1
-          fi
-
-          echo "Waiting for deposit to be claimable..."
-          sleep 60
-
-          destNetworkURL=$(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-003 rpc)
-          bridgeURL=$(kurtosis port print ${{ env.ENCLAVE_NAME }} zkevm-bridge-service-003 rpc)
-          polycli ulxly claim asset \
-              --bridge-address $bridge_address \
-              --private-key 12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625 \
-              --deposit-count 3 \
-              --destination-address 0xE34aaF64b29273B7D567FCFc40544c014EEe9970 \
-              --deposit-network 0 \
-              --rpc-url $destNetworkURL \
-              --bridge-service-url $bridgeURL \
-              --gas-price $(cast gas-price --rpc-url $destNetworkURL)
-          if [[ $ret_code -eq 0 ]]; then
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Exiting... Claim Transaction successfuly sent!"
-              exit 0
-          else
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Exiting... Claim Transaction failed!"
-              exit 1
-          fi
-        env:
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-      - name: Bridge from third PP L2 chain to first Rollup chain.
-        if: ${{ env.agglayer_prover_sp1_key || env.agglayer_prover_sp1_key != '' }}
-        working-directory: .github/scripts
-        run: |
-          echo "Sending a bridge transaction from third PP network to the first rollup Erigon RPC..."
-          bridge_address=$(kurtosis service exec ${{ env.ENCLAVE_NAME }} contracts-001 'jq -r .polygonZkEVMBridgeAddress /opt/zkevm/combined.json' 2>&1 | grep -P '0x\h*')
-          originNetworkURL=$(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-003 rpc)
-          polycli ulxly bridge asset \
-              --private-key 12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625 \
-              --value 1000000000000 \
-              --rpc-url $originNetworkURL \
-              --bridge-address $bridge_address \
-              --destination-network 1 \
-              --force-update-root=true \
-              --destination-address 0xE34aaF64b29273B7D567FCFc40544c014EEe9970 \
-              --gas-price $(cast gas-price --rpc-url $originNetworkURL)
-          if [[ $ret_code -eq 0 ]]; then
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Exiting... Deposit Transaction successfuly sent!"
-          else
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Exiting... Deposit Transaction failed!"
-              exit 1
-          fi
-
-          echo "Waiting for deposit to be claimable..."
-          sleep 210
-
-          destNetworkURL=$(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-001 rpc)
-          bridgeURL=$(kurtosis port print ${{ env.ENCLAVE_NAME }} zkevm-bridge-service-003 rpc)
-          polycli ulxly claim asset \
-              --bridge-address $bridge_address \
-              --private-key 12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625 \
-              --deposit-count 0 \
-              --destination-address 0xE34aaF64b29273B7D567FCFc40544c014EEe9970 \
-              --deposit-network 3 \
-              --rpc-url $destNetworkURL \
-              --bridge-service-url $bridgeURL \
-              --gas-price $(cast gas-price --rpc-url $destNetworkURL)
-          if [[ $ret_code -eq 0 ]]; then
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Exiting... Claim Transaction successfuly sent!"
-              exit 0
-          else
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Exiting... Claim Transaction failed!"
-              exit 1
-          fi
-        env:
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-          
-      - name: Dump enclave
-        if: ${{ !cancelled() }}
-        run: kurtosis enclave dump ${{ env.ENCLAVE_NAME }} ./dump
-
-      - name: Upload enclave dump
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: dump_attach_ckds_${{ github.run_id }}
-          path: ./dump
-
-  deploy-to-external_l1:
+  deploy-to-external-l1:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -623,265 +314,25 @@ jobs:
         run: kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=./.github/tests/external-l1/deploy-local-l1.yml .
 
       - name: Deploy to local L1 chain
-        run: |
-          kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=./.github/tests/external-l1/deploy-cdk-to-local-l1.yml .
+        run: kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=./.github/tests/external-l1/deploy-cdk-to-local-l1.yml .
 
       - name: Inspect enclave
         run: kurtosis enclave inspect ${{ env.ENCLAVE_NAME }}
 
-      - name: Monitor CDK chain verified batches (CDK Erigon Permissionless RPC)
+      - name: Monitor pessimistic chain virtual batches (CDK Erigon Permissionless RPC)
         working-directory: .github/scripts
         run: |
-          ./monitor-cdk-chain.sh \
+          ./monitor-pessimistic-chain.sh \
             --enclave ${{ env.ENCLAVE_NAME }} \
             --rpc-url "$(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-001 rpc)"
 
       - name: Dump enclave
-        if: ${{ !cancelled() }}
+        if: always()
         run: kurtosis enclave dump ${{ env.ENCLAVE_NAME }} ./dump
 
       - name: Upload enclave dump
-        if: ${{ !cancelled() }}
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dump_deploy_to_external_l1_${{ github.run_id }}
-          path: ./dump
-
-  attach-sovereign-rollup:
-    # This workflow depends on the existence of a valid secrets.SP1_PRIVATE_KEY, and will only run if this dependency is met.
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        # This step will only execute if the necessary secrets are available, preventing failures
-        # on pull requests from forked repositories.
-        if: ${{ env.DOCKERHUB_USERNAME && env.DOCKERHUB_TOKEN }}
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Install polycli
-        run: |
-          tmp_dir=$(mktemp -d) 
-          curl -L "https://github.com/0xPolygon/polygon-cli/releases/download/${{ env.POLYCLI_VERSION }}/polycli_${{ env.POLYCLI_VERSION }}_linux_amd64.tar.gz" | tar -xz -C "$tmp_dir" 
-          mv "$tmp_dir"/* /usr/local/bin/polycli 
-          rm -rf "$tmp_dir"
-          sudo chmod +x /usr/local/bin/polycli
-          /usr/local/bin/polycli version
-
-      - name: Install Kurtosis CDK tools
-        uses: ./.github/actions/setup-kurtosis-cdk
-
-      # Step to handle when the SP1_PRIVATE_KEY secret is available.
-      - name: Replace Agglayer SP1 Prover Key with Github Secrets
-        run: |
-          sed -i "s/agglayer_prover_sp1_key: null/agglayer_prover_sp1_key: \"${{ secrets.SP1_PRIVATE_KEY }}\"/" ./.github/tests/attach-sovereign-rollup.yml
-        # This step will only execute if the necessary secrets are available, preventing failures
-        # on pull requests from forked repositories.
-        if: ${{ env.agglayer_prover_sp1_key && env.agglayer_prover_sp1_key != '' }}
-        env :
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-      # Only run this step if the SP1_PRIVATE_KEY secrets is available.
-      - name: Deploy L1 and PP CDK L2 and OP Sovereign Rollup
-        if: ${{ env.agglayer_prover_sp1_key || env.agglayer_prover_sp1_key != '' }}
-        run: |
-          kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=./.github/tests/attach-sovereign-rollup.yml .
-        env:
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-      - name: Inspect enclave
-        run: kurtosis enclave inspect ${{ env.ENCLAVE_NAME }}
-        if: ${{ env.agglayer_prover_sp1_key && env.agglayer_prover_sp1_key != '' }}
-        env :
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-      - name: Send bridge transactions from L1 to OP Sovereign L2
-        if: ${{ env.agglayer_prover_sp1_key || env.agglayer_prover_sp1_key != '' }}
-        working-directory: .github/scripts
-        run: |
-          echo "Sending a bridge transaction from L1 to the OP Sovereign RPC..."
-          l1_prefunded_mnemonic="giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete"
-          private_key=$(cast wallet private-key --mnemonic "$l1_prefunded_mnemonic")
-          eth_address=$(cast wallet address --private-key $private_key)
-
-          polycli ulxly bridge asset \
-              --bridge-address 0x83F138B325164b162b320F797b57f6f7E235ABAC \
-              --destination-network 2 \
-              --private-key $private_key \
-              --rpc-url http://$(kurtosis port print ${{ env.ENCLAVE_NAME }} el-1-geth-lighthouse rpc) \
-              --value 10000000000000000000
-          if [[ $ret_code -eq 0 ]]; then
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Exiting... Deposit Transaction successfuly sent!"
-          else
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Exiting... Deposit Transaction failed!"
-              exit 1
-          fi
-
-          echo "Waiting for deposit to be autoclaimed..."
-          sleep 60
-
-          balance=$(cast balance --ether --rpc-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} op-el-1-op-geth-op-node-op-kurtosis rpc) $eth_address)
-          # Use bc to compare floating-point numbers
-          result=$(echo "$balance > 0" | bc)
-          if [[ "$result" -eq 1 ]]; then
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Deposit claimed, balance is $balance"
-          else
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Deposit was not claimed successfully..."
-          fi
-        env:
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-      - name: Bridge from OP Sovereign L2 to L1
-        if: ${{ env.agglayer_prover_sp1_key || env.agglayer_prover_sp1_key != '' }}
-        working-directory: .github/scripts
-        run: |
-          echo "Sending a bridge transaction from OP Sovereign L2 to L1..."
-          l1_prefunded_mnemonic="giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete"
-          private_key=$(cast wallet private-key --mnemonic "$l1_prefunded_mnemonic")
-          eth_address=$(cast wallet address --private-key $private_key)
-          polycli ulxly bridge asset \
-              --bridge-address 0x9A1f8eA578835d2b7b1e1EB8CD5EE3Bb7692338C \
-              --destination-network 0 \
-              --private-key $private_key \
-              --rpc-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} op-el-1-op-geth-op-node-op-kurtosis rpc) \
-              --value $(date +%s) \
-              --destination-address 0xC0FFEE0000000000000000000000000000000001
-          if [[ $ret_code -eq 0 ]]; then
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Exiting... Deposit Transaction successfuly sent!"
-          else
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Exiting... Deposit Transaction failed!"
-              exit 1
-          fi
-
-          echo "Waiting for deposit to be claimable..."
-          sleep 210
-
-          l1_prefunded_mnemonic="giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete"
-          private_key=$(cast wallet private-key --mnemonic "$l1_prefunded_mnemonic")
-          eth_address=$(cast wallet address --private-key $private_key)
-          polycli ulxly claim asset \
-              --bridge-address 0x83F138B325164b162b320F797b57f6f7E235ABAC \
-              --bridge-service-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} sovereign-bridge-service-001 rpc) \
-              --deposit-count 0 \
-              --destination-address 0xc0FFee0000000000000000000000000000000001 \
-              --deposit-network 2 \
-              --private-key $private_key \
-              --rpc-url http://$(kurtosis port print ${{ env.ENCLAVE_NAME }} el-1-geth-lighthouse rpc)
-          if [[ $ret_code -eq 0 ]]; then
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Exiting... Claim Transaction successfuly sent!"
-              exit 0
-          else
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Exiting... Claim Transaction failed!"
-              exit 1
-          fi
-        env:
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-      - name: Bridge from OP Sovereign L2 to CDK L2
-        if: ${{ env.agglayer_prover_sp1_key || env.agglayer_prover_sp1_key != '' }}
-        working-directory: .github/scripts
-        run: |
-          echo "Sending a bridge transaction from OP Sovereign L2 to CDK L2..."
-          l1_prefunded_mnemonic="giant issue aisle success illegal bike spike question tent bar rely arctic volcano long crawl hungry vocal artwork sniff fantasy very lucky have athlete"
-          private_key=$(cast wallet private-key --mnemonic "$l1_prefunded_mnemonic")
-          eth_address=$(cast wallet address --private-key $private_key)
-
-          polycli ulxly bridge asset \
-              --bridge-address 0x9A1f8eA578835d2b7b1e1EB8CD5EE3Bb7692338C \
-              --destination-network 1 \
-              --private-key $private_key \
-              --rpc-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} op-el-1-op-geth-op-node-op-kurtosis rpc) \
-              --value $(date +%s) \
-              --destination-address 0xC0FFEE0000000000000000000000000000000002
-          if [[ $ret_code -eq 0 ]]; then
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Exiting... Deposit Transaction successfuly sent!"
-          else
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Exiting... Deposit Transaction failed!"
-              exit 1
-          fi
-
-          echo "Waiting for deposit to be claimable..."
-          sleep 210
-
-          polycli ulxly claim asset \
-              --bridge-address 0x83F138B325164b162b320F797b57f6f7E235ABAC \
-              --bridge-service-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} sovereign-bridge-service-001 rpc) \
-              --deposit-count 1 \
-              --destination-address 0xc0FFee0000000000000000000000000000000002 \
-              --deposit-network 2 \
-              --private-key 0x12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625 \
-              --rpc-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-001 rpc) \
-              --gas-price $(cast gas-price --rpc-url $(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-001 rpc))
-          if [[ $ret_code -eq 0 ]]; then
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✅ Exiting... Claim Transaction successfuly sent!"
-              exit 0
-          else
-              echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ Exiting... Claim Transaction failed!"
-              exit 1
-          fi
-        env:
-            agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-            
-      - name: Dump enclave
-        if: ${{ !cancelled() && env.agglayer_prover_sp1_key && env.agglayer_prover_sp1_key != ''}}
-        run: kurtosis enclave dump ${{ env.ENCLAVE_NAME }} ./dump
-        env :
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-      - name: Upload enclave dump
-        if: ${{ !cancelled() && env.agglayer_prover_sp1_key && env.agglayer_prover_sp1_key != ''}}
-        uses: actions/upload-artifact@v4
-        with:
-          name: dump_attach_sovereign_${{ github.run_id }}
-          path: ./dump
-        env:
-          agglayer_prover_sp1_key: ${{ secrets.SP1_PRIVATE_KEY }}
-
-  deploy-to-anvil_l1:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        # This step will only execute if the necessary secrets are available, preventing failures
-        # on pull requests from forked repositories.
-        if: ${{ env.DOCKERHUB_USERNAME && env.DOCKERHUB_TOKEN }}
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Install Kurtosis CDK tools
-        uses: ./.github/actions/setup-kurtosis-cdk
-
-      - name: Deploy stack with anvil
-        run: kurtosis run --enclave=${{ env.ENCLAVE_NAME }} --args-file=./.github/tests/anvil/rollup.yml .
-
-      - name: Monitor CDK chain verified batches (CDK Erigon Permissionless RPC)
-        working-directory: .github/scripts
-        run: |
-          ./monitor-cdk-chain.sh \
-            --enclave ${{ env.ENCLAVE_NAME }} \
-            --rpc-url "$(kurtosis port print ${{ env.ENCLAVE_NAME }} cdk-erigon-rpc-001 rpc)"
-
-      - name: Dump enclave
-        if: ${{ !cancelled() }}
-        run: kurtosis enclave dump ${{ env.ENCLAVE_NAME }} ./dump
-
-      - name: Upload enclave dump
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: dump_deploy_to_anvil_l1_${{ github.run_id }}
           path: ./dump

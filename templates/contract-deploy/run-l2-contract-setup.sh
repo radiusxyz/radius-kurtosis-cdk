@@ -67,6 +67,11 @@ account_nonce="$(cast nonce --rpc-url "$l2_rpc_url" "$eth_address")"
 echo_ts "Funding bridge autoclaimer account on l2"
 fund_account_on_l2 "{{.zkevm_l2_claimtxmanager_address}}"
 
+# Only fund the claim tx manager address if l2 contracts are not being deployed.
+if [[ "$1" != "true" ]]; then
+    exit
+fi
+
 echo_ts "Funding accounts on l2"
 for (( i = 0; i < "{{.l2_accounts_to_fund}}"; i++ )); do
     address=$(cast wallet address --mnemonic "{{.l1_preallocated_mnemonic}}" --mnemonic-index "$i")
@@ -97,6 +102,7 @@ if [[ "{{.l2_deploy_deterministic_deployment_proxy}}" ]]; then
         --rpc-url "$l2_rpc_url" \
         --private-key "{{.zkevm_l2_admin_private_key}}" \
         --value "$gas_cost" \
+        --nonce "$account_nonce" \
         "$signer_address"
     cast publish --rpc-url "$l2_rpc_url" "$transaction"
     if [[ $(cast code --rpc-url "$l2_rpc_url" $deployer_address) == "0x" ]]; then

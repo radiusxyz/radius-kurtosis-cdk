@@ -48,11 +48,6 @@ CENTRAL_ENV_DBS = {
         "user": "dac_user",
         "password": "redacted",
     },
-    "sovereign_bridge_db": {
-        "name": "sovereign_bridge_db",
-        "user": "sovereign_bridge_user",
-        "password": "redacted",
-    },
 }
 
 # The prover database is a component of both central environment and permissionless zkEVM node environment.
@@ -187,7 +182,6 @@ def create_postgres_service(plan, db_configs, args, start_port_name):
     plan.add_service(
         name=_service_name(args["deployment_suffix"]),
         config=postgres_service_cfg,
-        description="Starting Postgres Service",
     )
 
 

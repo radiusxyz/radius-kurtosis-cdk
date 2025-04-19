@@ -1,5 +1,6 @@
 data_availability_package = import_module("./lib/data_availability.star")
 
+
 ARTIFACTS = [
     {
         "name": "deploy_parameters.json",
@@ -30,17 +31,45 @@ ARTIFACTS = [
         "file": "./templates/sovereign-rollup/run-sovereign-setup.sh",
     },
     {
+        "name": "run-sovereign-setup-predeployed.sh",
+        "file": "./templates/sovereign-rollup/run-sovereign-setup-predeployed.sh",
+    },
+    {
         "name": "create_new_rollup.json",
         "file": "./templates/sovereign-rollup/create_new_rollup.json",
+    },
+    {
+        "name": "add_rollup_type.json",
+        "file": "./templates/sovereign-rollup/add_rollup_type.json",
     },
     {
         "name": "sovereign-genesis.json",
         "file": "./templates/sovereign-rollup/genesis.json",
     },
+    {
+        "name": "create-genesis-sovereign-params.json",
+        "file": "./templates/sovereign-rollup/create-genesis-sovereign-params.json",
+    },
+    {
+        "name": "create-predeployed-sovereign-genesis.sh",
+        "file": "./templates/sovereign-rollup/create-predeployed-sovereign-genesis.sh",
+    },
+    {
+        "name": "op-original-genesis.json",
+        "file": "./templates/sovereign-rollup/op-original-genesis.json",
+    },
+    {
+        "name": "fund-addresses.sh",
+        "file": "./templates/sovereign-rollup/fund-addresses.sh",
+    },
+    {
+        "name": "run-initialize-rollup.sh",
+        "file": "./templates/sovereign-rollup/run-initialize-rollup.sh",
+    },
 ]
 
 
-def run(plan, args):
+def run(plan, args, deployment_stages, op_stack_args):
     artifact_paths = list(ARTIFACTS)
     # If we are configured to use a previous deployment, we'll
     # dynamically add artifacts for the genesis and combined outputs.
@@ -87,9 +116,18 @@ def run(plan, args):
                         "is_cdk_validium": data_availability_package.is_cdk_validium(
                             args
                         ),
+                        "deploy_op_succinct": deployment_stages.get(
+                            "deploy_op_succinct", False
+                        ),
                         "zkevm_rollup_consensus": data_availability_package.get_consensus_contract(
                             args
                         ),
+                        "deploy_optimism_rollup": deployment_stages.get(
+                            "deploy_optimism_rollup", False
+                        ),
+                        "op_stack_seconds_per_slot": op_stack_args["optimism_package"][
+                            "chains"
+                        ][0]["network_params"]["seconds_per_slot"],
                     },
                 )
             },
@@ -163,7 +201,7 @@ def run(plan, args):
 
     # Force update GER.
     plan.exec(
-        description="Update the GER so the L1 Info Tree Index is greater than 0",
+        description="Updating the GER so the L1 Info Tree Index is greater than 0",
         service_name=contracts_service_name,
         recipe=ExecRecipe(
             command=[

@@ -90,6 +90,7 @@ fund_account_on_l1 "sequencer" "{{.zkevm_l2_sequencer_address}}"
 fund_account_on_l1 "aggregator" "{{.zkevm_l2_aggregator_address}}"
 fund_account_on_l1 "agglayer" "{{.zkevm_l2_agglayer_address}}"
 fund_account_on_l1 "l1testing" "{{.zkevm_l2_l1testing_address}}"
+fund_account_on_l1 "sovereignadmin" "{{.zkevm_l2_sovereignadmin_address}}"
 
 echo_ts "Setting up local zkevm-contracts repo for deployment"
 pushd /opt/zkevm-contracts || exit 1
@@ -140,11 +141,23 @@ else
     cp /opt/zkevm/deploy_output.json /opt/zkevm-contracts/deployment/v2/
 fi
 
-echo_ts "Step 5: Creating Rollup/Validium"
-npx hardhat run deployment/v2/4_createRollup.ts --network localhost 2>&1 | tee 05_create_rollup.out
-if [[ ! -e deployment/v2/create_rollup_output.json ]]; then
-    echo_ts "The create_rollup_output.json file was not created after running createRollup"
-    exit 1
+# Do not create another rollup in the case of an optimism rollup. This will be done in run-sovereign-setup.sh
+deploy_optimism_rollup="{{.deploy_optimism_rollup}}"
+if [[ "$deploy_optimism_rollup" != "true" ]]; then
+    echo_ts "Step 5: Creating Rollup/Validium"
+    npx hardhat run deployment/v2/4_createRollup.ts --network localhost 2>&1 | tee 05_create_rollup.out
+    # Support for new output file format
+    if [[ $(echo deployment/v2/create_rollup_output_* | wc -w) -gt 1 ]]; then
+        echo_ts "There are multiple create rollup output files. We don't know how to handle this situation"
+        exit 1
+    fi
+    if [[ $(echo deployment/v2/create_rollup_output_* | wc -w) -eq 1 ]]; then
+        mv deployment/v2/create_rollup_output_* deployment/v2/create_rollup_output.json
+    fi
+    if [[ ! -e deployment/v2/create_rollup_output.json ]]; then
+        echo_ts "The create_rollup_output.json file was not created after running createRollup"
+        exit 1
+    fi
 fi
 
 # Combine contract deploy files.
@@ -154,7 +167,13 @@ echo_ts "Combining contract deploy files"
 mkdir -p /opt/zkevm
 cp /opt/zkevm-contracts/deployment/v2/deploy_*.json /opt/zkevm/
 cp /opt/zkevm-contracts/deployment/v2/genesis.json /opt/zkevm/
-cp /opt/zkevm-contracts/deployment/v2/create_rollup_output.json /opt/zkevm/
+# Check create_rollup_output.json exists before copying it.
+# For the case of deploy_optimism_rollup, create_rollup_output.json will not be created.
+if [[ -e /opt/zkevm-contracts/deployment/v2/create_rollup_output.json ]]; then
+    cp /opt/zkevm-contracts/deployment/v2/create_rollup_output.json /opt/zkevm/
+else
+    echo "File /opt/zkevm-contracts/deployment/v2/create_rollup_output.json does not exist."
+fi
 cp /opt/zkevm-contracts/deployment/v2/create_rollup_parameters.json /opt/zkevm/
 popd || exit 1
 
@@ -162,7 +181,14 @@ echo_ts "Creating combined.json"
 pushd /opt/zkevm/ || exit 1
 
 cp genesis.json genesis.original.json
-jq --slurpfile rollup create_rollup_output.json '. + $rollup[0]' deploy_output.json > combined.json
+# Check create_rollup_output.json exists before copying it.
+# For the case of deploy_optimism_rollup, create_rollup_output.json will not be created.
+if [[ -e create_rollup_output.json ]]; then
+    jq --slurpfile rollup create_rollup_output.json '. + $rollup[0]' deploy_output.json > combined.json
+else
+    echo "File create_rollup_output.json does not exist. Copying deploy_output.json to combined.json."
+    cp deploy_output.json combined.json
+fi
 jq '.polygonZkEVML2BridgeAddress = .polygonZkEVMBridgeAddress' combined.json > c.json; mv c.json combined.json
 
 # Add the L2 GER Proxy address in combined.json (for panoptichain).
@@ -228,10 +254,15 @@ if ! echo "$output_json" | jq . > "dynamic-{{.chain_name}}-allocs.json"; then
 fi
 
 echo_ts "Transformation complete. Output written to dynamic-{{.chain_name}}-allocs.json"
-jq '{"root": .root, "timestamp": 0, "gasLimit": 0, "difficulty": 0}' /opt/zkevm/genesis.json > "dynamic-{{.chain_name}}-conf.json"
-batch_timestamp=$(jq '.firstBatchData.timestamp' combined.json)
-jq --arg bt "$batch_timestamp" '.timestamp |= ($bt | tonumber)' "dynamic-{{.chain_name}}-conf.json" > tmp_output.json
-mv tmp_output.json "dynamic-{{.chain_name}}-conf.json"
+if [[ -e create_rollup_output.json ]]; then
+    jq '{"root": .root, "timestamp": 0, "gasLimit": 0, "difficulty": 0}' /opt/zkevm/genesis.json > "dynamic-{{.chain_name}}-conf.json"
+    batch_timestamp=$(jq '.firstBatchData.timestamp' combined.json)
+    jq --arg bt "$batch_timestamp" '.timestamp |= ($bt | tonumber)' "dynamic-{{.chain_name}}-conf.json" > tmp_output.json
+    mv tmp_output.json "dynamic-{{.chain_name}}-conf.json"
+else
+    echo "Without create_rollup_output.json, there is no batch_timestamp available"
+    jq '{"root": .root, "timestamp": 0, "gasLimit": 0, "difficulty": 0}' /opt/zkevm/genesis.json > "dynamic-{{.chain_name}}-conf.json"
+fi
 
 # zkevm.initial-batch.config
 jq '.firstBatchData' combined.json > first-batch-config.json
@@ -337,5 +368,3 @@ fi
 
 # The contract setup is done!
 touch "/opt/zkevm/.init-complete{{.deployment_suffix}}.lock"
-
-
