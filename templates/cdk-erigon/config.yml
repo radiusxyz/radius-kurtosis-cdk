@@ -355,7 +355,7 @@ zkevm.platform-url: http://14.32.133.68:8545
 #zkevm.platform-url: https://ethereum-holesky-rpc.publicnode.com
 #zkevm.platform-url: https://holesky.infura.io/v3/c3367c2bd73d4053804e08bc1a64d281
 
-zkevm.liveness-contract-address: 0x9659cA1F2Fe0AeC16E7768B740fE806e42663FFC
+zkevm.liveness-contract-address: 0x08B12273c26b5957Ad92339544B369b68EBb9EC5
 
 zkevm.service-type: radius
 
