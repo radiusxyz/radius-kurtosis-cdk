@@ -364,7 +364,9 @@ zkevm.cluster-id: radius
 
 zkevm.seed-node-url: http://34.64.51.210:6000
 
-zkevm.sequencer-private-key: 12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625
+#zkevm.sequencer-private-key: 12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625
+
+zkevm.sequencer-private-key: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
 
 zkevm.lighthouse-url: http://34.47.107.69:8080
 
