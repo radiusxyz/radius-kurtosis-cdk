@@ -368,7 +368,7 @@ zkevm.seed-node-url: http://34.64.51.210:6000
 
 zkevm.sequencer-private-key: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
 
-zkevm.lighthouse-url: http://34.47.107.69:8080
+zkevm.lighthouse-url: ws://34.47.107.69:8080/ws
 
 zkevm.slot-time: 3000
 
