@@ -103,13 +103,13 @@ def run_rpc(plan, args, contract_setup_addresses):
     #     zkevm_sequencer_service.ports["data-streamer"].number,
     # )
 
-    pool_manager_service = plan.get_service(
-        name="zkevm-pool-manager" + args["deployment_suffix"]
-    )
-    pool_manager_url = "http://{}:{}".format(
-        pool_manager_service.ip_address,
-        pool_manager_service.ports["http"].number,
-    )
+    # pool_manager_service = plan.get_service(
+    #     name="zkevm-pool-manager" + args["deployment_suffix"]
+    # )
+    # pool_manager_url = "http://{}:{}".format(
+    #     pool_manager_service.ip_address,
+    #     pool_manager_service.ports["http"].number,
+    # )
     cdk_erigon_config_template = read_file(src="./templates/cdk-erigon/config.yml")
     cdk_erigon_rpc_config_artifact = plan.render_templates(
         name="cdk-erigon-rpc-config-artifact",
