@@ -92,16 +92,16 @@ def run_sequencer(plan, args, contract_setup_addresses):
 
 
 def run_rpc(plan, args, contract_setup_addresses):
-    zkevm_sequencer_service = plan.get_service(
-        name=args["sequencer_name"] + args["deployment_suffix"]
-    )
-    zkevm_sequence_url = "http://{}:{}".format(
-        zkevm_sequencer_service.ip_address, zkevm_sequencer_service.ports["rpc"].number
-    )
-    zkevm_datastreamer_url = "{}:{}".format(
-        zkevm_sequencer_service.ip_address,
-        zkevm_sequencer_service.ports["data-streamer"].number,
-    )
+    # zkevm_sequencer_service = plan.get_service(
+    #     name=args["sequencer_name"] + args["deployment_suffix"]
+    # )
+    # zkevm_sequence_url = "http://{}:{}".format(
+    #     zkevm_sequencer_service.ip_address, zkevm_sequencer_service.ports["rpc"].number
+    # )
+    # zkevm_datastreamer_url = "{}:{}".format(
+    #     zkevm_sequencer_service.ip_address,
+    #     zkevm_sequencer_service.ports["data-streamer"].number,
+    # )
 
     pool_manager_service = plan.get_service(
         name="zkevm-pool-manager" + args["deployment_suffix"]
