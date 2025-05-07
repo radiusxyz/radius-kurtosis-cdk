@@ -166,6 +166,22 @@ def run(plan, args={}):
     else:
         plan.print("Skipping the deployment of the agglayer")
 
+        # Deploy cdk-erigon node.
+        if deployment_stages.get("deploy_cdk_erigon_node", False):
+            plan.print("Deploying cdk-erigon node")
+            import_module(cdk_erigon_package).run_rpc(
+                plan,
+                args
+                | {
+                    "l1_rpc_url": args["mitm_rpc_url"].get(
+                        "erigon-rpc", args["l1_rpc_url"]
+                    )
+                },
+                contract_setup_addresses,
+                )
+        else:
+            plan.print("Skipping the deployment of cdk-erigon node")
+
     if not deployment_stages.get("deploy_optimism_rollup", False):
         # Deploy cdk central/trusted environment.
         if deployment_stages.get("deploy_cdk_central_environment", False):
