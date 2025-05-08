@@ -241,7 +241,7 @@ DEFAULT_L1_ARGS = {
     # Enable the Electra hardfork.
     "pectra_enabled": False,
     # The amount of ETH sent to the admin, sequence, aggregator, sequencer and other chosen addresses.
-    "l1_funding_amount": "100000000000ether",
+    "l1_funding_amount": "1000000ether",
     # Default: 2
     "l1_participants_count": 1,
     # Whether to deploy https://github.com/AggLayer/lxly-bridge-and-call
