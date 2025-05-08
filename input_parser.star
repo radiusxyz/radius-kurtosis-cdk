@@ -564,6 +564,16 @@ def parse_args(plan, user_args):
     if "deployment_stages" in args:
         args.pop("deployment_stages")
 
+    # ---------------------------------------
+    # Missing values default setting (no value 해결)
+    # ---------------------------------------
+    args["zkevm_admin_address"] = args.get("zkevm_admin_address", "0xE34aaF64b29273B7D567FCFc40544c014EEe9970")
+    args["zkevm_rollup_manager_address"] = args.get("zkevm_rollup_manager_address", "0x35b75f623311c87863Dd34a1fFE9A62a69fd4F87")
+    args["zkevm_rollup_address"] = args.get("zkevm_rollup_address", "0x28eb6e90A1d4C8ba008d89d13482EdeFFf595461")
+    args["zkevm_global_exit_root_address"] = args.get("zkevm_global_exit_root_address", "0x1f7ad7caA53e35b4f0D138dC5CBF91aC108a2674")
+    args["pol_token_address"] = args.get("pol_token_address", "0xEdE9cf798E0fE25D35469493f43E88FeA4a5da0E")
+    args["zkevm_rollup_manager_block_number"] = args.get("zkevm_rollup_manager_block_number", 42)
+
     args = args | {
         "l2_rpc_name": l2_rpc_name,
         "sequencer_name": sequencer_name,
@@ -963,13 +973,3 @@ def validate_aggchain_vkey_with_binary(plan, aggchain_vkey, aggkit_prover_image)
         assertion="==",
         target_value=aggchain_vkey,
     )
-
-# ---------------------------------------
-# Missing values default setting (no value 해결)
-# ---------------------------------------
-zkevm_admin_address = args.get("zkevm_admin_address", "0xE34aaF64b29273B7D567FCFc40544c014EEe9970")
-zkevm_rollup_manager_address = args.get("zkevm_rollup_manager_address", "0x35b75f623311c87863Dd34a1fFE9A62a69fd4F87")
-zkevm_rollup_address = args.get("zkevm_rollup_address", "0x28eb6e90A1d4C8ba008d89d13482EdeFFf595461")
-zkevm_global_exit_root_address = args.get("zkevm_global_exit_root_address", "0x1f7ad7caA53e35b4f0D138dC5CBF91aC108a2674")
-pol_token_address = args.get("pol_token_address", "0xEdE9cf798E0fE25D35469493f43E88FeA4a5da0E")
-zkevm_rollup_manager_block_number = args.get("zkevm_rollup_manager_block_number", 42)
