@@ -98,10 +98,10 @@ def run_rpc(plan, args, contract_setup_addresses):
     # zkevm_sequence_url = "http://{}:{}".format(
     #     zkevm_sequencer_service.ip_address, zkevm_sequencer_service.ports["rpc"].number
     # )
-    # zkevm_datastreamer_url = "{}:{}".format(
-    #     zkevm_sequencer_service.ip_address,
-    #     zkevm_sequencer_service.ports["data-streamer"].number,
-    # )
+    zkevm_datastreamer_url = "{}:{}".format(
+        "34.64.139.203",
+        32929,
+    )
 
     # pool_manager_service = plan.get_service(
     #     name="zkevm-pool-manager" + args["deployment_suffix"]
@@ -118,7 +118,7 @@ def run_rpc(plan, args, contract_setup_addresses):
                 template=cdk_erigon_config_template,
                 data={
                     "zkevm_sequencer_url": "http://34.64.139.203:32930",
-                    # "zkevm_datastreamer_url": "http://34.64.139.203",
+                    "zkevm_datastreamer_url": zkevm_datastreamer_url,
                     "is_sequencer": False,
                     "pool_manager_url": "http://34.64.139.203:32933",
                     "consensus_contract_type": args["consensus_contract_type"],
