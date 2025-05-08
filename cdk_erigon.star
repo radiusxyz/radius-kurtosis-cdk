@@ -121,7 +121,6 @@ def run_rpc(plan, args, contract_setup_addresses):
                     "zkevm_datastreamer_url": "http://34.64.139.203:32929",
                     "is_sequencer": False,
                     "pool_manager_url": "http://34.64.139.203:32933",
-                    "l1_rpc_url": "http://34.64.139.203:32910",
                     "consensus_contract_type": args["consensus_contract_type"],
                     "l1_sync_start_block": 0,
                     "prometheus_port": args["prometheus_port"],
