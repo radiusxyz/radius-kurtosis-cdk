@@ -196,12 +196,12 @@ DEFAULT_L1_ARGS = {
     "l1_preallocated_private_key": "0xbcdf20249abf0ed6d944c0288fad489e33f66b3960d9e6229c1cd214ed3bbe31",
     # The L1 HTTP RPC endpoint.
     # "l1_rpc_url": "http://el-1-geth-lighthouse:8545",
-    "l1_rpc_url": "http://34.64.139.203:32948",
+    "l1_rpc_url": "http://34.64.139.203:32986",
     # The L1 WS RPC endpoint.
-    "l1_ws_url": "ws://34.64.139.203:32949",
+    "l1_ws_url": "ws://34.64.139.203:32987",
     # The L1 concensus layer RPC endpoint.
     # "l1_beacon_url": "http://cl-1-lighthouse-geth:4000",
-    "l1_beacon_url": "http://34.64.139.203:32953",
+    "l1_beacon_url": "http://34.64.139.203:32991",
     # The additional services to spin up.
     # Default: []
     # Options:
