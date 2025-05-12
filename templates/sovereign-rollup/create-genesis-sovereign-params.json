@@ -14,6 +14,10 @@
         {
             "balance": "1000000000000000000",
             "address": "0x8576158a89648aA88B6036f47B8b74Fc0C2b5c66"
+        },
+        {
+        "balance": "100000000000000000000000000000",
+        "address": "0x98b91dC75bf7E29e8b0AD610a0fceA501646dDf6"
         }
     ],
     "setTimelockParameters": true,
