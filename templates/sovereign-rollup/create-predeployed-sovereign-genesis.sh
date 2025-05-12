@@ -134,8 +134,6 @@ elif isinstance(items, list):
 else:
     raise ValueError("Unexpected JSON structure")
 
-allocs[addr] = {"balance": "100000000000000000000000000000"}
-
 # Write the output file
 with open(predeployed_allocs, "w") as fg_output:
     json.dump(allocs, fg_output, indent=4)

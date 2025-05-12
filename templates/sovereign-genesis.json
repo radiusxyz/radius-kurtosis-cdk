@@ -100,12 +100,6 @@
      "balance": "110000000000000000000000000000",
      "nonce": "8",
      "address": "0xE34aaF64b29273B7D567FCFc40544c014EEe9970"
-    },
-    {
-     "accountName": "AptGame",
-     "balance": "100000000000000000000000000000",
-     "nonce": "0",
-     "address": "0x98b91dC75bf7E29e8b0AD610a0fceA501646dDf6"
     }
    ],
    "rollupCreationBlockNumber": 48,
