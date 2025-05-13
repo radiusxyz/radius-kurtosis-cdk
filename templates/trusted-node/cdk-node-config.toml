@@ -45,11 +45,11 @@ genesisBlockNumber = "{{.zkevm_rollup_manager_block_number}}"
 
 
 [SequenceSender.AvailDAConfig]
-        seed = ""
+        seed = "rib stomach antenna receive loop must miracle rapid equip age famous vessel"
         ws_api_url = "wss://turing-rpc.avail.so/ws"
         http_api_url = "https://turing-indexer.avail.so"
         bridge_api_url = "https://turing-bridge-api.fra.avail.so"
-        app_id = 0
+        app_id = 433
         timeout = 1200
 
 [Log]
@@ -73,11 +73,11 @@ Outputs = ["stderr"]
                 MaxConns = 200
 
         [Aggregator.Synchronizer.Etherman.AvailDAConfig]
-                seed = ""
+                seed = "rib stomach antenna receive loop must miracle rapid equip age famous vessel"
                 ws_api_url = "wss://turing-rpc.avail.so/ws"
                 http_api_url = "https://turing-indexer.avail.so"
                 bridge_api_url = "https://turing-bridge-api.fra.avail.so"
-                app_id = 0
+                app_id = 433
                 timeout = 1200
        
 [AggSender]
