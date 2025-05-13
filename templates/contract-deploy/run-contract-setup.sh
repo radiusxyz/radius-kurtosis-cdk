@@ -202,8 +202,7 @@ tmp="genesis.tmp"
 cp genesis.json "$tmp"
 
 for addr in "${addresses[@]}"; do
-  lower_addr=$(echo "$addr" | tr '[:upper:]' '[:lower:]')
-  jq --arg addr "$lower_addr" --arg bal "$balance" \
+  jq --arg addr "$addr" --arg bal "$balance" \
     '.alloc[$addr] = { "balance": $bal }' "$tmp" > "${tmp}.next" && mv "${tmp}.next" "$tmp"
 done
 
