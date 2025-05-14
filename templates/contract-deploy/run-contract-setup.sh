@@ -179,6 +179,8 @@ popd || exit 1
 echo_ts "Creating combined.json"
 pushd /opt/zkevm/ || exit 1
 
+sed -i "s|\"balance\": \"100000000000000000000000\"|\"balance\": \"100000000000000000000000000000000\"|g" genesis.json
+
 cp genesis.json genesis.original.json
 # Check create_rollup_output.json exists before copying it.
 # For the case of deploy_optimism_rollup, create_rollup_output.json will not be created.
