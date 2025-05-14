@@ -195,14 +195,16 @@ addresses=(
   "0x2546BcD3c84621e976D8185a91A922aE77ECEc30"
 )
 
-balance="100000000000000000000000000000000"
+balance="0x204fce5e3e25026110000000"
+
+cp genesis.json genesis.original.json
 
 tmp="genesis.tmp"
-
 cp genesis.json "$tmp"
 
 for addr in "${addresses[@]}"; do
-  jq --arg addr "$addr" --arg bal "$balance" \
+  addr_lower=$(echo "$addr" | tr '[:upper:]' '[:lower:]')
+  jq --arg addr "$addr_lower" --arg bal "$balance" \
     '.alloc[$addr] = { "balance": $bal }' "$tmp" > "${tmp}.next" && mv "${tmp}.next" "$tmp"
 done
 
