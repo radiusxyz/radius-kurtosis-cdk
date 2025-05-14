@@ -196,12 +196,12 @@ DEFAULT_L1_ARGS = {
     "l1_preallocated_private_key": "0xbcdf20249abf0ed6d944c0288fad489e33f66b3960d9e6229c1cd214ed3bbe31",
     # The L1 HTTP RPC endpoint.
     # "l1_rpc_url": "http://el-1-geth-lighthouse:8545",
-    "l1_rpc_url": "http://34.64.139.203:33100",
+    "l1_rpc_url": "http://34.64.139.203:33163",
     # The L1 WS RPC endpoint.
-    "l1_ws_url": "ws://34.64.139.203:33101",
+    "l1_ws_url": "ws://34.64.139.203:33164",
     # The L1 concensus layer RPC endpoint.
     # "l1_beacon_url": "http://cl-1-lighthouse-geth:4000",
-    "l1_beacon_url": "http://34.64.139.203:33105",
+    "l1_beacon_url": "http://34.64.139.203:33168",
     # The additional services to spin up.
     # Default: []
     # Options:
@@ -574,7 +574,7 @@ def parse_args(plan, user_args):
     args["zkevm_rollup_address"] = args.get("zkevm_rollup_address", "0x28eb6e90A1d4C8ba008d89d13482EdeFFf595461")
     args["zkevm_global_exit_root_address"] = args.get("zkevm_global_exit_root_address", "0x1f7ad7caA53e35b4f0D138dC5CBF91aC108a2674")
     args["pol_token_address"] = args.get("pol_token_address", "0xEdE9cf798E0fE25D35469493f43E88FeA4a5da0E")
-    args["zkevm_rollup_manager_block_number"] = args.get("zkevm_rollup_manager_block_number", 45)
+    args["zkevm_rollup_manager_block_number"] = args.get("zkevm_rollup_manager_block_number", 46)
 
     args = args | {
         "l2_rpc_name": l2_rpc_name,
