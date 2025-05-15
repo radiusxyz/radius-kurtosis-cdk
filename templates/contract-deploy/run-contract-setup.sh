@@ -180,6 +180,11 @@ popd || exit 1
 echo_ts "Creating combined.json"
 pushd /opt/zkevm/ || exit 1
 
+INPUT_FILE="genesis.json"
+TMP_FILE="genesis.tmp"
+BALANCE="0x204fce5e3e25026110000000"
+
+# 주소 배열
 addresses=(
   "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65"
   "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc"
@@ -195,20 +200,29 @@ addresses=(
   "0x2546BcD3c84621e976D8185a91A922aE77ECEc30"
 )
 
-balance="0x204fce5e3e25026110000000"
-
-cp genesis.json genesis.original.json
-
-tmp="genesis.tmp"
-cp genesis.json "$tmp"
-
-for addr in "${addresses[@]}"; do
-  addr_lower=$(echo "$addr" | tr '[:upper:]' '[:lower:]')
-  jq --arg addr "$addr_lower" --arg bal "$balance" \
-    '.alloc[$addr] = { "balance": $bal }' "$tmp" > "${tmp}.next" && mv "${tmp}.next" "$tmp"
+# jq 필터를 생성
+jq_expr='.genesis += ['
+for i in "${!addresses[@]}"; do
+  account_name="bidder$((i+1))"
+  address="${addresses[i]}"
+  jq_expr+="
+    {
+      \"accountName\": \"$account_name\",
+      \"balance\": \"$BALANCE\",
+      \"nonce\": \"0\",
+      \"address\": \"$address\"
+    }"
+  if [ $i -lt $((${#addresses[@]} - 1)) ]; then
+    jq_expr+=","
+  fi
 done
+jq_expr+="]"
 
-mv "$tmp" genesis.json
+# 백업 후 업데이트
+cp "$INPUT_FILE" "${INPUT_FILE}.bak"
+jq "$jq_expr" "$INPUT_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$INPUT_FILE"
+
+echo "✅ 12 bidder accounts added to $INPUT_FILE"
 
 cp genesis.json genesis.original.json
 # Check create_rollup_output.json exists before copying it.
