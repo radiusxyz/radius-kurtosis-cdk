@@ -33,7 +33,7 @@ This document shows you how to migrate from fork 7 to fork 9 using the Kurtosis 
 
     zkevm_contracts_image: leovct/zkevm-contracts # the tag is automatically replaced by the value of /zkevm_rollup_fork_id/
     @@ -160,7 +160,7 @@ args:
-    zkevm_rollup_chain_id: 10101
+    zkevm_rollup_chain_id: 128128
 
     # The fork id of the new rollup. It indicates the prover (zkROM/executor) version.
     -  zkevm_rollup_fork_id: 9
