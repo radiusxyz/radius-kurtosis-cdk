@@ -1,0 +1,32 @@
+{
+  "args": {
+    "zkevm_l2_sequencer_address": "${ZKEVM_L2_SEQUENCER_ADDRESS}",
+    "zkevm_l2_sequencer_private_key": "${ZKEVM_L2_SEQUENCER_PRIV_KEY}",
+    "zkevm_l2_aggregator_address": "${ZKEVM_L2_AGGREGATOR_ADDRESS}",
+    "zkevm_l2_aggregator_private_key": "${ZKEVM_L2_AGGREGATOR_PRIV_KEY}",
+    "zkevm_l2_claimtxmanager_address": "${ZKEVM_L2_CLAIMTXMANAGER_ADDRESS}",
+    "zkevm_l2_claimtxmanager_private_key": "${ZKEVM_L2_CLAIMTXMANAGER_PRIV_KEY}",
+    "zkevm_l2_timelock_address": "${ZKEVM_L2_TIMELOCK_ADDRESS}",
+    "zkevm_l2_timelock_private_key": "${ZKEVM_L2_TIMELOCK_PRIV_KEY}",
+    "zkevm_l2_admin_address": "${ZKEVM_L2_ADMIN_ADDRESS}",
+    "zkevm_l2_admin_private_key": "${ZKEVM_L2_ADMIN_PRIV_KEY}",
+    "zkevm_l2_loadtest_address": "${ZKEVM_L2_LOADTEST_ADDRESS}",
+    "zkevm_l2_loadtest_private_key": "${ZKEVM_L2_LOADTEST_PRIV_KEY}",
+    "zkevm_l2_agglayer_address": "${ZKEVM_L2_AGGLAYER_ADDRESS}",
+    "zkevm_l2_agglayer_private_key": "${ZKEVM_L2_AGGLAYER_PRIV_KEY}",
+    "zkevm_l2_dac_address": "${ZKEVM_L2_DAC_ADDRESS}",
+    "zkevm_l2_dac_private_key": "${ZKEVM_L2_DAC_PRIV_KEY}",
+    "zkevm_l2_proofsigner_address": "${ZKEVM_L2_PROOFSIGNER_ADDRESS}",
+    "zkevm_l2_proofsigner_private_key": "${ZKEVM_L2_PROOFSIGNER_PRIV_KEY}",
+    "zkevm_l2_l1testing_address": "${ZKEVM_L2_L1TESTING_ADDRESS}",
+    "zkevm_l2_l1testing_private_key": "${ZKEVM_L2_L1TESTING_PRIV_KEY}",
+    "zkevm_l2_claimsponsor_address": "${ZKEVM_L2_CLAIMSPONSOR_ADDRESS}",
+    "zkevm_l2_claimsponsor_private_key": "${ZKEVM_L2_CLAIMSPONSOR_PRIV_KEY}",
+    "zkevm_l2_aggoracle_address": "${ZKEVM_L2_AGGORACLE_ADDRESS}",
+    "zkevm_l2_aggoracle_private_key": "${ZKEVM_L2_AGGORACLE_PRIV_KEY}",
+    "zkevm_l2_sovereignadmin_address": "${ZKEVM_L2_SOVEREIGNADMIN_ADDRESS}",
+    "zkevm_l2_sovereignadmin_private_key": "${ZKEVM_L2_SOVEREIGNADMIN_PRIV_KEY}",
+    "zkevm_l2_claimtx_address": "${ZKEVM_L2_CLAIMTX_ADDRESS}",
+    "zkevm_l2_claimtx_private_key": "${ZKEVM_L2_CLAIMTX_PRIV_KEY}"
+  }
+}
