@@ -393,6 +393,15 @@ DEFAULT_ARGS = (
         # Only relevant when deploying to an external L1.
         "polygon_zkevm_explorer": "https://explorer.private/",
         "l1_explorer_url": "https://sepolia.etherscan.io/",
+        "use_tx_orderer": False,
+        "rollup_id": "",
+        "platform_url": "",
+        "liveness_contract_address": "",
+        "sequencer_private_key": "",
+        "avail_da_seed": "",
+        "avail_app_id": "",
+        "avail_ws_api_url": "",
+        "avail_http_api_url": "",
     }
     | DEFAULT_IMAGES
     | DEFAULT_PORTS
@@ -445,6 +454,8 @@ def parse_args(plan, user_args):
     )
     op_stack_args = user_args.get("optimism_package", {})
     args = DEFAULT_ARGS | user_args.get("args", {})
+
+    plan.print("DEBUGYM: zkevm_l2_sequencer_address = " + args.get("zkevm_l2_sequencer_address", "NOT SET"))
 
     # Change some params if anvil set to make it work
     # As it changes L1 config it needs to be run before other functions/checks

@@ -86,7 +86,7 @@
             "accountName": "deployer",
             "balance": "100000000000000000000000",
             "nonce": "8",
-            "address": "0xE34aaF64b29273B7D567FCFc40544c014EEe9970"
+            "address": "0x79F2d9232F9Dd577a67A6255400d9CB752F6Dc9C"
         }
     ],
     "rollupCreationBlockNumber": 48,

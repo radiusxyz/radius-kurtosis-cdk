@@ -65,7 +65,7 @@ SVC_PROVER=zkevm-prover-001
 SVC_CDKNODE=cdk-node-001
 
 # send test tx
-PRIV_KEY=0x12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625
+PRIV_KEY="0x${SEQUENCER_PRIVATE_KEY}"
 cast send --rpc-url $(kurtosis port print "$STACK_NAME" $SVC_RPC rpc) --legacy --private-key $PRIV_KEY --value 0.01ether 0x0000000000000000000000000000000000000000
 
 # Halt sequencer
