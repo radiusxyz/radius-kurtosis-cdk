@@ -38,6 +38,11 @@ def run_sequencer(plan, args, contract_setup_addresses):
                     "consensus_contract_type": args["consensus_contract_type"],
                     "l1_sync_start_block": 1 if args["anvil_state_file"] else 0,
                     "prometheus_port": args["prometheus_port"],
+                    "USE_TX_ORDERER": args["USE_TX_ORDERER"],
+                    "ROLLUP_ID": args["ROLLUP_ID"],
+                    "PLATFORM_URL": args["PLATFORM_URL"],
+                    "LIVENESS_CONTRACT_ADDRESS": args["LIVENESS_CONTRACT_ADDRESS"],
+                    "ZKEVM_L2_SEQUENCER_PRIV_KEY": args["ZKEVM_L2_SEQUENCER_PRIV_KEY"]
                 }
                 | args
                 | contract_setup_addresses,
