@@ -342,29 +342,25 @@ zkevm.allow-free-transactions: false
 # Default: false
 zkevm.allow-pre-eip155-transactions: true
 
-zkevm.use-tx-orderer: false
-
 zkevm.max-sbb-finalization-capacity: 10
-
-#zkevm.rollup-id: radius_rollup_sign
-zkevm.rollup-id: rollup_id_2
 
 zkevm.platform: ethereum
 
-zkevm.platform-url: http://14.32.133.68:8545
-#zkevm.platform-url: https://ethereum-holesky-rpc.publicnode.com
-#zkevm.platform-url: https://holesky.infura.io/v3/c3367c2bd73d4053804e08bc1a64d281
-
-zkevm.liveness-contract-address: 0x08B12273c26b5957Ad92339544B369b68EBb9EC5
-
 zkevm.service-type: radius
 
-#zkevm.cluster-id: radius_tx_orderer_test
 zkevm.cluster-id: radius
 
 zkevm.seed-node-url: http://34.64.51.210:6000
 
-zkevm.sequencer-private-key: 12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625
+zkevm.use-tx-orderer: "${USE_TX_ORDERER}"
+
+zkevm.rollup-id: "${ROLLUP_ID}"
+
+zkevm.platform-url: "${PLATFORM_URL}"
+
+zkevm.liveness-contract-address: "${LIVENESS_CONTRACT_ADDRESS}"
+
+zkevm.sequencer-private-key: "${ZKEVM_L2_SEQUENCER_PRIV_KEY}"
 
 # --------------------------------------------------------------------------------------------------
 #   ______  _________     ____  __           _______  _______ ____ _   _ _____ ___  ____
