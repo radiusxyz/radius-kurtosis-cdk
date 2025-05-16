@@ -352,15 +352,15 @@ zkevm.cluster-id: radius
 
 zkevm.seed-node-url: http://34.64.51.210:6000
 
-zkevm.use-tx-orderer: '{{USE_TX_ORDERER}}'
+zkevm.use-tx-orderer: {{.USE_TX_ORDERER}}
 
-zkevm.rollup-id: '{{ROLLUP_ID}}'
+zkevm.rollup-id: {{.ROLLUP_ID}}
 
-zkevm.platform-url: '{{PLATFORM_URL}}'
+zkevm.platform-url: {{.PLATFORM_URL}}
 
-zkevm.liveness-contract-address: '{{LIVENESS_CONTRACT_ADDRESS}}'
+zkevm.liveness-contract-address: {{.LIVENESS_CONTRACT_ADDRESS}}
 
-zkevm.sequencer-private-key: '{{ZKEVM_L2_SEQUENCER_PRIV_KEY}}'
+zkevm.sequencer-private-key: {{.ZKEVM_L2_SEQUENCER_PRIV_KEY}}
 
 # --------------------------------------------------------------------------------------------------
 #   ______  _________     ____  __           _______  _______ ____ _   _ _____ ___  ____
