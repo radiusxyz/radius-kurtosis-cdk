@@ -41,7 +41,7 @@ DEFAULT_DEPLOYMENT_STAGES = {
 DEFAULT_IMAGES = {
     "aggkit_image": "ghcr.io/agglayer/aggkit:0.0.2",  # https://github.com/agglayer/aggkit/pkgs/container/aggkit
     "agglayer_image": "ghcr.io/agglayer/agglayer:0.3.0-rc.5",  # https://github.com/agglayer/agglayer/tags
-    "cdk_erigon_node_image": "theradius/radius-cdk-erigon:apt-game-v1.0.1",  # radius
+    "cdk_erigon_node_image": "theradius/radius-cdk-erigon:v1.0.0-radius",  # radius
     "cdk_node_image": "availproject/cdk:avail-develop-v0.5.3-rc1",  # Polygon cdk with avail integration  https://github.com/availproject/cdk/
     "cdk_validium_node_image": "0xpolygon/cdk-validium-node:0.7.0-cdk",  # https://hub.docker.com/r/0xpolygon/cdk-validium-node/tags
     "zkevm_bridge_proxy_image": "haproxy:3.1-bookworm",  # https://hub.docker.com/_/haproxy/tags
@@ -279,7 +279,7 @@ DEFAULT_ROLLUP_ARGS = {
     # The keystore password.
     "zkevm_l2_keystore_password": "pSnv6Dh5s9ahuzGzH9RoCDrKAMddaX3m",
     # The rollup network identifier.
-    "zkevm_rollup_chain_id": 128128,
+    "zkevm_rollup_chain_id": 10101,
     # The unique identifier for the rollup within the RollupManager contract.
     # This setting sets the rollup as the first rollup.
     "zkevm_rollup_id": 1,

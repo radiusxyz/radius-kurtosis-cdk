@@ -122,7 +122,7 @@ while [ "$FINALIZED_BLOCK" -lt $((FORK_BLOCK - 6)) ]; do
         --destination-network 0 \
         --rpc-url "$L2_RPC_URL" \
         --private-key "$FUNDED_PRV_KEY" \
-        --chain-id 128128 \
+        --chain-id 10101 \
         --pretty-logs=false
     echo "Forkid from $FORK_BLOCK still ahead from finalized $FINALIZED_BLOCK"
     sleep $BLOCK_TIME
@@ -157,7 +157,7 @@ while true; do
         --destination-network 0 \
         --rpc-url "$L2_RPC_URL" \
         --private-key "$FUNDED_PRV_KEY" \
-        --chain-id 128128 \
+        --chain-id 10101 \
         --pretty-logs=false
     # In the following line -t for timeout, -N for just 1 character
     read -r -p "Press any key to stop sending bridges" -t 5 -N 1 input
