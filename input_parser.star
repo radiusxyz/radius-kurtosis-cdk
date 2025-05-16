@@ -398,6 +398,10 @@ DEFAULT_ARGS = (
         "platform_url": "",
         "liveness_contract_address": "",
         "sequencer_private_key": "",
+        "avail_da_seed": "",
+        "avail_app_id": "",
+        "avail_ws_api_url": "",
+        "avail_http_api_url": "",
     }
     | DEFAULT_IMAGES
     | DEFAULT_PORTS
