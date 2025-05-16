@@ -393,6 +393,7 @@ DEFAULT_ARGS = (
         # Only relevant when deploying to an external L1.
         "polygon_zkevm_explorer": "https://explorer.private/",
         "l1_explorer_url": "https://sepolia.etherscan.io/",
+        "use_tx_orderer": False,
     }
     | DEFAULT_IMAGES
     | DEFAULT_PORTS
