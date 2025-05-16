@@ -1,5 +1,10 @@
 {
   "args": {
+    "zkevm_use-tx-orderer": "${USE_TX_ORDERER}",
+    "zkevm_rollup-id": "${ROLLUP_ID}",
+    "zkevm_platform-url": "${PLATFORM_URL}",
+    "zkevm_liveness-contract-address": "${LIVENESS_CONTRACT_ADDRESS}",
+    "zkevm_sequencer-private-key": "${.ZKEVM_L2_SEQUENCER_PRIV_KEY}",
     "zkevm_l2_sequencer_address": "${ZKEVM_L2_SEQUENCER_ADDRESS}",
     "zkevm_l2_sequencer_private_key": "${ZKEVM_L2_SEQUENCER_PRIV_KEY}",
     "zkevm_l2_aggregator_address": "${ZKEVM_L2_AGGREGATOR_ADDRESS}",
