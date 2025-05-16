@@ -117,6 +117,10 @@ def run(plan, args, contract_setup_addresses):
                         "l1_rpc_url": args["mitm_rpc_url"].get(
                             "cdk-node", args["l1_rpc_url"]
                         ),
+                        "avail_da_seed": args["avail_da_seed"],
+                        "avail_app_id": args["avail_app_id"],
+                        "avail_ws_api_url": args["avail_ws_api_url"],
+                        "avail_http_api_url": args["avail_http_api_url"],
                     }
                     | db_configs
                     | contract_setup_addresses,
