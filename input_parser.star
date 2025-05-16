@@ -394,6 +394,10 @@ DEFAULT_ARGS = (
         "polygon_zkevm_explorer": "https://explorer.private/",
         "l1_explorer_url": "https://sepolia.etherscan.io/",
         "use_tx_orderer": False,
+        "rollup_id": "",
+        "platform_url": "",
+        "liveness_contract_address": "",
+        "sequencer_private_key": "",
     }
     | DEFAULT_IMAGES
     | DEFAULT_PORTS
