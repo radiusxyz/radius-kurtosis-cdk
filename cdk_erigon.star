@@ -38,11 +38,11 @@ def run_sequencer(plan, args, contract_setup_addresses):
                     "consensus_contract_type": args["consensus_contract_type"],
                     "l1_sync_start_block": 1 if args["anvil_state_file"] else 0,
                     "prometheus_port": args["prometheus_port"],
-                    "USE_TX_ORDERER": args["use_tx_orderer"],
-                    "ROLLUP_ID": args["rollup_id"],
-                    "PLATFORM_URL": args["platform_url"],
-                    "LIVENESS_CONTRACT_ADDRESS": args["liveness_contract_address"],
-                    "ZKEVM_L2_SEQUENCER_PRIV_KEY": args["zkevm_l2_sequencer_private_key"]
+                    "use_tx_orderer": args["use_tx_orderer"],
+                    "rollup_id": args["rollup_id"],
+                    "platform_url": args["platform_url"],
+                    "liveness_contract_address": args["liveness_contract_address"],
+                    "zkevm_l2_sequencer_private_key": args["zkevm_l2_sequencer_private_key"]
                 }
                 | args
                 | contract_setup_addresses,
@@ -129,6 +129,11 @@ def run_rpc(plan, args, contract_setup_addresses):
                     "consensus_contract_type": args["consensus_contract_type"],
                     "l1_sync_start_block": 0,
                     "prometheus_port": args["prometheus_port"],
+                    "use_tx_orderer": args["use_tx_orderer"],
+                    "rollup_id": args["rollup_id"],
+                    "platform_url": args["platform_url"],
+                    "liveness_contract_address": args["liveness_contract_address"],
+                    "zkevm_l2_sequencer_private_key": args["zkevm_l2_sequencer_private_key"]
                 }
                 | args
                 | contract_setup_addresses,
