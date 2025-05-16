@@ -42,7 +42,7 @@ def run_sequencer(plan, args, contract_setup_addresses):
                     "ROLLUP_ID": args["rollup_id"],
                     "PLATFORM_URL": args["platform_url"],
                     "LIVENESS_CONTRACT_ADDRESS": args["liveness_contract_address"],
-                    "ZKEVM_L2_SEQUENCER_PRIV_KEY": args["zkevm_l2_sequencer_priv_key"]
+                    "ZKEVM_L2_SEQUENCER_PRIV_KEY": args["zkevm_l2_sequencer_private_key"]
                 }
                 | args
                 | contract_setup_addresses,
