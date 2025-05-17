@@ -360,7 +360,7 @@ zkevm.platform-url: {{.platform_url}}
 
 zkevm.liveness-contract-address: {{.liveness_contract_address}}
 
-zkevm.sequencer-private-key: {{.zkevm_l2_sequencer_private_key}}
+zkevm.sequencer-private-key: {{.sequencer_private_key}}
 
 # --------------------------------------------------------------------------------------------------
 #   ______  _________     ____  __           _______  _______ ____ _   _ _____ ___  ____
