@@ -248,7 +248,7 @@ file should be named ~dynamic-migrationexample-chainspec.json~:
 > conf/dynamic-migrationexample-chainspec.json cat <<EOF
 {
   "ChainName": "dynamic-migrationexample",
-  "chainId": 10101,
+  "chainId": 256256,
   "consensus": "ethash",
   "homesteadBlock": 0,
   "daoForkBlock": 0,
@@ -375,7 +375,7 @@ datadir: /home/erigon/erigon-data
 chain: dynamic-migrationexample
 http: true
 
-zkevm.l2-chain-id: 10101
+zkevm.l2-chain-id: 256256
 zkevm.l2-sequencer-rpc-url: http://zkevm-node-sequencer-001:8123
 zkevm.l2-datastreamer-url: ds-host:6900
 zkevm.l1-chain-id: 11155111

@@ -1,7 +1,7 @@
 # This args-file deploys the CDK-4 chain.
 # RollupID for the CI would be:
 # 0: L1 (271828)
-# 1: cdk-erigon-validium-1 (10101)
+# 1: cdk-erigon-validium-1 (256256)
 # 2: cdk-opgeth-sovereign (2151908)
 # 3: cdk-erigon-validium-2 (30303)
 # 4: cdk-erigon-sovereign (40404)
