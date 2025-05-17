@@ -1,10 +1,10 @@
 {
   "args": {
-    "use-tx-orderer": ${USE_TX_ORDERER},
-    "rollup-id": "${ROLLUP_ID}",
-    "platform-url": "${PLATFORM_URL}",
-    "liveness-contract-address": "${LIVENESS_CONTRACT_ADDRESS}",
-    "sequencer-private-key": "${ZKEVM_L2_SEQUENCER_PRIV_KEY}",
+    "use_tx_orderer": ${USE_TX_ORDERER},
+    "rollup_id": "${ROLLUP_ID}",
+    "platform_url": "${PLATFORM_URL}",
+    "liveness_contract_address": "${LIVENESS_CONTRACT_ADDRESS}",
+    "sequencer_private_key": "${ZKEVM_L2_SEQUENCER_PRIV_KEY}",
     "avail_da_seed": "${AVAIL_DA_SEED}",
     "avail_app_id": ${AVAIL_APP_ID},
     "avail_ws_api_url": "${AVAIL_WS_API_URL}",
