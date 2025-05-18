@@ -184,7 +184,6 @@ INPUT_FILE="genesis.json"
 TMP_FILE="genesis.tmp"
 BALANCE="0x204fce5e3e25026110000000"
 
-# 주소 배열
 addresses=(
   "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65"
   "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc"
@@ -200,7 +199,6 @@ addresses=(
   "0x2546BcD3c84621e976D8185a91A922aE77ECEc30"
 )
 
-# jq 필터를 생성
 jq_expr='.genesis += ['
 for i in "${!addresses[@]}"; do
   account_name="bidder$((i+1))"
@@ -218,7 +216,6 @@ for i in "${!addresses[@]}"; do
 done
 jq_expr+="]"
 
-# 백업 후 업데이트
 cp "$INPUT_FILE" "${INPUT_FILE}.bak"
 jq "$jq_expr" "$INPUT_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$INPUT_FILE"
 
