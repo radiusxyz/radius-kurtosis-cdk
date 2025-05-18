@@ -1,0 +1,11 @@
+{
+  "args": {
+    "datastreamer_url": "${DATASTREAMER_URL}",
+    "sequencer_url": "${SEQUENCER_URL}",
+    "pool_manager_url": "${POOL_MANAGER_URL}",
+    "l1_rpc_url": "${L1_RPC_URL}",
+    "l1_ws_url": "${L1_WS_URL}",
+    "l1_beacon_url": "${L1_BEACON_URL}",
+    "l1_first_block": "${L1-FIRST_BLOCK}"
+  }
+}

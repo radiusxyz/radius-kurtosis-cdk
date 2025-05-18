@@ -436,6 +436,13 @@ DEFAULT_ARGS = (
         # Only relevant when deploying to an external L1.
         "polygon_zkevm_explorer": "https://explorer.private/",
         "l1_explorer_url": "https://sepolia.etherscan.io/",
+        "datastreamer_url": "",
+        "sequencer_url": "",
+        "pool_manager_url": "",
+        "l1_rpc_url": "",
+        "l1_ws_url": "",
+        "l1_beacon_url": "",
+        "l1_first_block": ""
     }
     | DEFAULT_IMAGES
     | DEFAULT_PORTS
@@ -574,7 +581,8 @@ def parse_args(plan, user_args):
     args["zkevm_rollup_address"] = args.get("zkevm_rollup_address", "0x28eb6e90A1d4C8ba008d89d13482EdeFFf595461")
     args["zkevm_global_exit_root_address"] = args.get("zkevm_global_exit_root_address", "0x1f7ad7caA53e35b4f0D138dC5CBF91aC108a2674")
     args["pol_token_address"] = args.get("pol_token_address", "0xEdE9cf798E0fE25D35469493f43E88FeA4a5da0E")
-    args["zkevm_rollup_manager_block_number"] = args.get("zkevm_rollup_manager_block_number", 46)
+    args["zkevm_rollup_manager_block_number"] = args.get("l1_first_block")
+    # args["zkevm_rollup_manager_block_number"] = args.get("zkevm_rollup_manager_block_number", 46)
 
     args = args | {
         "l2_rpc_name": l2_rpc_name,

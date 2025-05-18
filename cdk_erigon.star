@@ -92,24 +92,11 @@ def run_sequencer(plan, args, contract_setup_addresses):
 
 
 def run_rpc(plan, args, contract_setup_addresses):
-    # zkevm_sequencer_service = plan.get_service(
-    #     name=args["sequencer_name"] + args["deployment_suffix"]
+    # zkevm_datastreamer_url = "{}:{}".format(
+    #     "34.64.139.203",
+    #     33182,
     # )
-    # zkevm_sequence_url = "http://{}:{}".format(
-    #     zkevm_sequencer_service.ip_address, zkevm_sequencer_service.ports["rpc"].number
-    # )
-    zkevm_datastreamer_url = "{}:{}".format(
-        "34.64.139.203",
-        33182,
-    )
 
-    # pool_manager_service = plan.get_service(
-    #     name="zkevm-pool-manager" + args["deployment_suffix"]
-    # )
-    # pool_manager_url = "http://{}:{}".format(
-    #     pool_manager_service.ip_address,
-    #     pool_manager_service.ports["http"].number,
-    # )
     cdk_erigon_config_template = read_file(src="./templates/cdk-erigon/config.yml")
     cdk_erigon_rpc_config_artifact = plan.render_templates(
         name="cdk-erigon-rpc-config-artifact",
@@ -117,10 +104,10 @@ def run_rpc(plan, args, contract_setup_addresses):
             "config.yaml": struct(
                 template=cdk_erigon_config_template,
                 data={
-                    "zkevm_sequencer_url": "http://34.64.139.203:33183",
-                    "zkevm_datastreamer_url": zkevm_datastreamer_url,
+                    "zkevm_sequencer_url": args["sequencer_url"],
+                    "zkevm_datastreamer_url": args["datastreamer_url"],
                     "is_sequencer": False,
-                    "pool_manager_url": "http://34.64.139.203:33186",
+                    "pool_manager_url": args["pool_manager_url"],
                     "consensus_contract_type": args["consensus_contract_type"],
                     "l1_sync_start_block": 0,
                     "prometheus_port": args["prometheus_port"],
