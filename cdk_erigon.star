@@ -94,7 +94,7 @@ def run_sequencer(plan, args, contract_setup_addresses):
 def run_rpc(plan, args, contract_setup_addresses):
     zkevm_datastreamer_url = "{}:{}".format(
         args["datastreamer_url"],
-        args["datastreamer"],
+        args["datastreamer_port"],
     )
 
     cdk_erigon_config_template = read_file(src="./templates/cdk-erigon/config.yml")
