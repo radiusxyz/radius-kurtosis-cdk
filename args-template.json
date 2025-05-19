@@ -6,6 +6,6 @@
     "l1_rpc_url": "${L1_RPC_URL}",
     "l1_ws_url": "${L1_WS_URL}",
     "l1_beacon_url": "${L1_BEACON_URL}",
-    "l1_first_block": ${L1-FIRST_BLOCK}
+    "zkevm_rollup_manager_block_number": ${ZKEVM_ROLLUP_MANAGER_BLOCK_NUMBER}
   }
 }
