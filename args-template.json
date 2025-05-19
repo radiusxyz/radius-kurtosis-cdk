@@ -1,6 +1,7 @@
 {
   "args": {
     "datastreamer_url": "${DATASTREAMER_URL}",
+    "datastreamer_port": "${DATASTREAMER_PORT}",
     "sequencer_url": "${SEQUENCER_URL}",
     "pool_manager_url": "${POOL_MANAGER_URL}",
     "l1_rpc_url": "${L1_RPC_URL}",

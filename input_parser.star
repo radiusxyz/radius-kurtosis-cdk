@@ -437,6 +437,7 @@ DEFAULT_ARGS = (
         "polygon_zkevm_explorer": "https://explorer.private/",
         "l1_explorer_url": "https://sepolia.etherscan.io/",
         "datastreamer_url": "",
+        "datastreamer_port": "",
         "sequencer_url": "",
         "pool_manager_url": "",
         "l1_rpc_url": "",

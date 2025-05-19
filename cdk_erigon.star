@@ -92,10 +92,10 @@ def run_sequencer(plan, args, contract_setup_addresses):
 
 
 def run_rpc(plan, args, contract_setup_addresses):
-    # zkevm_datastreamer_url = "{}:{}".format(
-    #     "34.64.139.203",
-    #     33182,
-    # )
+    zkevm_datastreamer_url = "{}:{}".format(
+        args["datastreamer_url"],
+        args["datastreamer"],
+    )
 
     cdk_erigon_config_template = read_file(src="./templates/cdk-erigon/config.yml")
     cdk_erigon_rpc_config_artifact = plan.render_templates(
@@ -105,7 +105,7 @@ def run_rpc(plan, args, contract_setup_addresses):
                 template=cdk_erigon_config_template,
                 data={
                     "zkevm_sequencer_url": args["sequencer_url"],
-                    "zkevm_datastreamer_url": args["datastreamer_url"],
+                    "zkevm_datastreamer_url": zkevm_datastreamer_url,
                     "is_sequencer": False,
                     "pool_manager_url": args["pool_manager_url"],
                     "consensus_contract_type": args["consensus_contract_type"],
