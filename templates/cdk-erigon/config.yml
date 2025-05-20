@@ -358,7 +358,7 @@ zkevm.service-type: radius
 
 zkevm.cluster-id: radius_cluster
 
-zkevm.seed-node-url: http://34.64.51.210:6000
+zkevm.seed-node-url: http://35.189.33.95:10002
 
 zkevm.sequencer-private-key: 12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625
 
