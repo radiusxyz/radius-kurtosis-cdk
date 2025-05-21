@@ -31,7 +31,7 @@ fi
 
 SOURCE_FORKID=$1
 TARGET_FORKID=$2
-ERIGON_IMAGE=theradius/radius-cdk-erigon:v1.0.0-radius
+ERIGON_IMAGE=theradius/radius-cdk-erigon:v1.0.1-radius
 STACK_NAME=upgradeCDK-$(
     tr -dc A-Za-z0-9 </dev/urandom | head -c 13
     echo
