@@ -25,7 +25,7 @@ optimism_package:
       #   cl_image: "us-docker.pkg.dev/oplabs-tools-artifacts/images/op-node:develop"
       network_params:
         name: "001"
-        network_id: 256256
+        network_id: 512512
 args:
   verbosity: debug
   consensus_contract_type: pessimistic
