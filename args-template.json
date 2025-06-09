@@ -5,6 +5,8 @@
     "platform_url": "${PLATFORM_URL}",
     "liveness_contract_address": "${LIVENESS_CONTRACT_ADDRESS}",
     "sequencer_private_key": "${ZKEVM_L2_SEQUENCER_PRIV_KEY}",
+    "seed_node_url": "${SEED_NODE_URL}",
+    "cluster_id": "${CLUSTER_ID}",
     "avail_da_seed": "${AVAIL_DA_SEED}",
     "avail_app_id": ${AVAIL_APP_ID},
     "avail_ws_api_url": "${AVAIL_WS_API_URL}",
