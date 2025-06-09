@@ -348,9 +348,9 @@ zkevm.platform: ethereum
 
 zkevm.service-type: radius
 
-zkevm.cluster-id: radius
+zkevm.cluster-id: {{.cluster_id}}
 
-zkevm.seed-node-url: http://34.64.51.210:6000
+zkevm.seed-node-url: {{.seed_node_url}}
 
 zkevm.use-tx-orderer: {{.use_tx_orderer}}
 

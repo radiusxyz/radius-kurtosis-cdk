@@ -439,6 +439,8 @@ DEFAULT_ARGS = (
         "platform_url": "",
         "liveness_contract_address": "",
         "sequencer_private_key": "",
+        "seed_node_url": "",
+        "cluster_id": "",
     }
     | DEFAULT_IMAGES
     | DEFAULT_PORTS

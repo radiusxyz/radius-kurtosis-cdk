@@ -42,7 +42,9 @@ def run_sequencer(plan, args, contract_setup_addresses):
                     "rollup_id": args["rollup_id"],
                     "platform_url": args["platform_url"],
                     "liveness_contract_address": args["liveness_contract_address"],
-                    "sequencer_private_key": args["sequencer_private_key"]
+                    "sequencer_private_key": args["sequencer_private_key"],
+                    "seed_node_url": args["seed_node_url"],
+                    "cluster_id": args["cluster_id"]
                 }
                 | args
                 | contract_setup_addresses,
@@ -133,7 +135,9 @@ def run_rpc(plan, args, contract_setup_addresses):
                     "rollup_id": args["rollup_id"],
                     "platform_url": args["platform_url"],
                     "liveness_contract_address": args["liveness_contract_address"],
-                    "sequencer_private_key": args["sequencer_private_key"]
+                    "sequencer_private_key": args["sequencer_private_key"],
+                    "seed_node_url": args["seed_node_url"],
+                    "cluster_id": args["cluster_id"]
                 }
                 | args
                 | contract_setup_addresses,
