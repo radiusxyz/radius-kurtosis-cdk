@@ -342,25 +342,25 @@ zkevm.allow-free-transactions: false
 # Default: false
 zkevm.allow-pre-eip155-transactions: true
 
-zkevm.use-tx-orderer: true
-
 zkevm.max-sbb-finalization-capacity: 10
-
-zkevm.rollup-id: radius_rollup
 
 zkevm.platform: ethereum
 
-zkevm.platform-url: http://35.189.33.95:8545
-
-zkevm.liveness-contract-address: 0xbdEd0D2bf404bdcBa897a74E6657f1f12e5C6fb6
-
 zkevm.service-type: radius
 
-zkevm.cluster-id: radius_cluster
+zkevm.cluster-id: radius
 
-zkevm.seed-node-url: http://35.189.33.95:10002
+zkevm.seed-node-url: http://34.64.51.210:6000
 
-zkevm.sequencer-private-key: 12d7de8621a77640c9241b2595ba78ce443d05e94090365ab3bb5e19df82c625
+zkevm.use-tx-orderer: {{.use_tx_orderer}}
+
+zkevm.rollup-id: {{.rollup_id}}
+
+zkevm.platform-url: {{.platform_url}}
+
+zkevm.liveness-contract-address: {{.liveness_contract_address}}
+
+zkevm.sequencer-private-key: {{.sequencer_private_key}}
 
 # --------------------------------------------------------------------------------------------------
 #   ______  _________     ____  __           _______  _______ ____ _   _ _____ ___  ____
