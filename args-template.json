@@ -5,6 +5,8 @@
     "platform_url": "${PLATFORM_URL}",
     "liveness_contract_address": "${LIVENESS_CONTRACT_ADDRESS}",
     "sequencer_private_key": "${ZKEVM_L2_SEQUENCER_PRIV_KEY}",
+    "seed_node_url": "${SEED_NODE_URL}",
+    "cluster_id": "${CLUSTER_ID}",
     "zkevm_l2_sequencer_address": "${ZKEVM_L2_SEQUENCER_ADDRESS}",
     "zkevm_l2_sequencer_private_key": "${ZKEVM_L2_SEQUENCER_PRIV_KEY}",
     "zkevm_l2_aggregator_address": "${ZKEVM_L2_AGGREGATOR_ADDRESS}",
@@ -33,5 +35,5 @@
     "zkevm_l2_sovereignadmin_private_key": "${ZKEVM_L2_SOVEREIGNADMIN_PRIV_KEY}",
     "zkevm_l2_claimtx_address": "${ZKEVM_L2_CLAIMTX_ADDRESS}",
     "zkevm_l2_claimtx_private_key": "${ZKEVM_L2_CLAIMTX_PRIV_KEY}"
-    }
+  }
 }
