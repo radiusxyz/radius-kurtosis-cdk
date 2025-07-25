@@ -370,7 +370,7 @@ zkevm.sequencer-private-key: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3
 
 zkevm.lighthouse-url: ws://34.64.120.174:8080/ws
 
-zkevm.slot-time: 3000
+zkevm.slot-time: 250
 
 zkevm.sbb-url: http://34.64.120.174:3333
 # --------------------------------------------------------------------------------------------------
