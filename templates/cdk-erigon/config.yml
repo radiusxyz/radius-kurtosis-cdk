@@ -860,7 +860,7 @@ http.vhosts: "*"
 
 # The APIs offered by the HTTP RPC server.
 # Default: "eth,erigon,engine"
-http.api: [eth, debug, net, trace, web3, erigon, zkevm, txpool]
+http.api: [eth, debug, net, trace, web3, erigon, zkevm, txpool, ots]
 
 # Trace HTTP requests with INFO level.
 # Default: false
