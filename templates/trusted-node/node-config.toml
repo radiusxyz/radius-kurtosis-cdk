@@ -526,7 +526,7 @@ L2Coinbase = "0x0000000000000000000000000000000000000000"
 MaxLogsCount = 1000
 
 # ------------------------------------------------------------------------------
-# MaxLogsBlockRange MaxLogsBlockRange is a configuration to set the
+# MaxLogsBlockRange is a configuration to set the
 # max range for block number when querying TXslogs in a single call to
 # the state, if zero it means no limit
 # ------------------------------------------------------------------------------
@@ -646,7 +646,7 @@ MaxSHA256Hashes = 0
 # SyncInterval defines the wait duration between reading new
 # information from the trusted sequencer, DAC, L1. Specifically, this
 # controls how long we wait between running sync operations and not
-# the frequence of syncs.
+# the frequency of syncs.
 # ------------------------------------------------------------------------------
 SyncInterval = "1s"
 
@@ -672,7 +672,7 @@ TrustedSequencerURL = ""
 # https://www.alchemy.com/overviews/ethereum-commitment-levels
 #
 # This value is configured for latest to speed up testing in the local
-# environment but this is not recommened for production environments
+# environment but this is not recommended for production environments
 # ------------------------------------------------------------------------------
 # SyncBlockProtection = "safe"
 # SyncBlockProtection = "finalized"
@@ -1117,16 +1117,16 @@ L2Coinbase = "{{.zkevm_l2_sequencer_address}}"
 
 # ------------------------------------------------------------------------------
 # SenderAddress should generally be the address of the trusted
-# sequencer. This is the address that that the manager uses for
+# sequencer. This is the address that the manager uses for
 # signing the L1 txs.
 # ------------------------------------------------------------------------------
 SenderAddress = "{{.zkevm_l2_sequencer_address}}"
 
 # ------------------------------------------------------------------------------
-# PrivateKey is a object with the keystore and password that are used
+# PrivateKey is an object with the keystore and password that are used
 # for signing transactions. The keystore is a standard go-ethereum
 # style keystore that is encrypted with the provided password. In this
-# particular context, this needs to be the sequencers private key.
+# particular context, this needs to be the sequencer's private key.
 # ------------------------------------------------------------------------------
 [SequenceSender.PrivateKey]
 Path = "/etc/zkevm/sequencer.keystore"
@@ -1285,10 +1285,10 @@ SenderAddress = "{{.zkevm_l2_aggregator_address}}"
 {{end}}
 
 # ------------------------------------------------------------------------------
-# PrivateKey is a object with the keystore and password that are used
+# PrivateKey is an object with the keystore and password that are used
 # for signing transactions. The keystore is a standard go-ethereum
 # style keystore that is encrypted with the provided password. In this
-# particular context, this needs to be the sequencers private key.
+# particular context, this needs to be the sequencer's private key.
 # ------------------------------------------------------------------------------
 [Aggregator.SequencerPrivateKey]
 Path = "/etc/zkevm/sequencer.keystore"
@@ -1352,7 +1352,7 @@ CheckBlocks = 0
 Percentile = 0
 
 # ------------------------------------------------------------------------------
-# UpdatePeriod determins how often we'll call the UpdateGasPriceAvg
+# UpdatePeriod determines how often we'll call the UpdateGasPriceAvg
 # method of our gas pricer
 # ------------------------------------------------------------------------------
 UpdatePeriod = "10s"

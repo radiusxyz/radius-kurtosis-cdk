@@ -8,7 +8,7 @@ cdk_node_package = import_module("./lib/cdk_node.star")
 databases = import_module("./databases.star")
 
 
-def run(plan, args, contract_setup_addresses):
+def run(plan, args, deployment_stages, contract_setup_addresses):
     db_configs = databases.get_db_configs(
         args["deployment_suffix"], args["sequencer_type"]
     )
@@ -31,6 +31,8 @@ def run(plan, args, contract_setup_addresses):
         not args["zkevm_use_real_verifier"]
         and not args["enable_normalcy"]
         and not args["consensus_contract_type"] == constants.CONSENSUS_TYPE.pessimistic
+        and not args["consensus_contract_type"]
+        == constants.CONSENSUS_TYPE.ecdsa_multisig
     ):
         zkevm_prover_package.start_prover(
             plan, args, prover_config_artifact, "zkevm_prover_start_port"
@@ -101,6 +103,7 @@ def run(plan, args, contract_setup_addresses):
         )
 
     if args["sequencer_type"] == "erigon":
+        agglayer_endpoint = get_agglayer_endpoint(plan, args, deployment_stages)
         # Create the cdk node config.
         node_config_template = read_file(
             src="./templates/trusted-node/cdk-node-config.toml"
@@ -118,6 +121,7 @@ def run(plan, args, contract_setup_addresses):
                         "l1_rpc_url": args["mitm_rpc_url"].get(
                             "cdk-node", args["l1_rpc_url"]
                         ),
+                        "agglayer_endpoint": agglayer_endpoint,
                     }
                     | db_configs
                     | contract_setup_addresses,
@@ -142,10 +146,10 @@ def get_keystores_artifacts(plan, args):
         service_name="contracts" + args["deployment_suffix"],
         src="/opt/zkevm/sequencer.keystore",
     )
-    aggregator_keystore_artifact = plan.store_service_files(
+    aggregator_keystore_artifact = plan.get_files_artifact(
         name="aggregator-keystore",
-        service_name="contracts" + args["deployment_suffix"],
-        src="/opt/zkevm/aggregator.keystore",
+        # service_name="contracts" + args["deployment_suffix"],
+        # src="/opt/zkevm/aggregator.keystore",
     )
     proofsigner_keystore_artifact = plan.store_service_files(
         name="proofsigner-keystore",
@@ -157,11 +161,17 @@ def get_keystores_artifacts(plan, args):
         service_name="contracts" + args["deployment_suffix"],
         src="/opt/zkevm/dac.keystore",
     )
+    claim_sponsor_keystore_artifact = plan.store_service_files(
+        name="claimsponsor-keystore-cdk",
+        service_name="contracts" + args["deployment_suffix"],
+        src="/opt/zkevm/claimsponsor.keystore",
+    )
     return struct(
         sequencer=sequencer_keystore_artifact,
         aggregator=aggregator_keystore_artifact,
         proofsigner=proofsigner_keystore_artifact,
         dac=dac_keystore_artifact,
+        claim_sponsor=claim_sponsor_keystore_artifact,
     )
 
 
@@ -186,3 +196,18 @@ def create_dac_config_artifact(plan, args, db_configs, contract_setup_addresses)
             )
         },
     )
+
+
+# Function to allow cdk-node-config to pick whether to use agglayer_readrpc_port or agglayer_grpc_port depending on whether cdk-node or aggkit-node is being deployed.
+# On aggkit/cdk-node point of view, only the agglayer_image version is important. Both services can work with both grpc/readrpc and this depends on the agglayer version.
+# On Kurtosis point of view, we are checking whether the cdk-node or the aggkit node is being used to filter the grpc/readrpc.
+def get_agglayer_endpoint(plan, args, deployment_stages):
+    if (
+        "0.3" in args["agglayer_image"]
+        and args.get("binary_name") == cdk_node_package.AGGKIT_BINARY_NAME
+    ):
+        return "grpc"
+    elif deployment_stages["deploy_optimism_rollup"]:
+        return "grpc"
+    else:
+        return "readrpc"

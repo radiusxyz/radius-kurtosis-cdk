@@ -59,7 +59,7 @@ L2URLs = ["{{.l2_rpc_url}}"]
 SyncInterval = "5s"
 # Number of blocks to read in each synchronization operation if the service is not synced and if there is enough data.
 SyncChunkSize = 100
-# Forces the SyncChunkSize for L2 networks. The chunck size won't be higher than the value specified but if there is not enough events in the network, the reorg protection can be affected.
+# Forces the SyncChunkSize for L2 networks. The chunk size won't be higher than the value specified but if there is not enough events in the network, the reorg protection can be affected.
 ForceL2SyncChunk = true
 
 # Bridge Controller Configuration
@@ -80,6 +80,8 @@ HTTPPort = "{{.rpc_port_number}}"
 DefaultPageLimit = 25
 # Maximum limit for paginated results to prevent excessive data retrieval
 MaxPageLimit = 1000
+# FinalizedGEREnabled is used to only compute mt proofs with finalized GER. If all the networks are synced in the same bridge service, this flag must be disabled.
+FinalizedGEREnabled = true
     # Database configuration for the bridge server. Could be the same config as SyncDB but ideally It should be a read replica to distribute the load.
     [BridgeServer.DB]
     # Type of database for the bridge server

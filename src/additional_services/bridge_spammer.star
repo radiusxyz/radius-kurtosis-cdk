@@ -4,7 +4,7 @@ wallet_module = import_module("../wallet/wallet.star")
 # The folder where bridge spammer template files are stored in the repository.
 TEMPLATES_FOLDER_PATH = "../../static_files/additional_services/bridge-spammer"
 # The name of the bridge spammer script.
-SCRIPT_NAME = "spam.sh"
+SCRIPT_NAME = "bridge.sh"
 
 # The folder where bridge spammer scripts are stored inside the service.
 SCRIPT_FOLDER_PATH = "/opt/scripts"
@@ -27,7 +27,7 @@ def run(plan, args, contract_setup_addresses):
         address=args.get("zkevm_l2_claimtxmanager_address"),
         rpc_url=l2_rpc_url,
         funder_private_key=funder_private_key,
-        value="10ether",
+        value="50ether",
     )
 
     # Start the bridge spammer.
@@ -59,6 +59,7 @@ def run(plan, args, contract_setup_addresses):
                 "L2_BRIDGE_ADDRESS": contract_setup_addresses.get(
                     "zkevm_bridge_l2_address"
                 ),
+                "L2_NETWORK_ID": str(args.get("zkevm_rollup_id")),
             },
             entrypoint=["bash", "-c"],
             cmd=["chmod +x {0}/{1} && {0}/{1}".format(SCRIPT_FOLDER_PATH, SCRIPT_NAME)],
