@@ -19,8 +19,8 @@ DEFAULT_DEPLOYMENT_STAGES = {
     "deploy_cdk_central_environment": True,
     # Deploy CDK bridge infrastructure.
     "deploy_cdk_bridge_infra": True,
-    # Deploy CDK bridge UI.
-    "deploy_cdk_bridge_ui": False,
+    # Deploy CDK bridge UI.원래 False
+    "deploy_cdk_bridge_ui": True,
     # Deploy the agglayer.
     "deploy_agglayer": True,
     # Deploy cdk-erigon node.
@@ -29,8 +29,8 @@ DEFAULT_DEPLOYMENT_STAGES = {
     # Deploy Optimism rollup.
     # Note the default behavior will only deploy the OP Stack without CDK Erigon stack.
     # Setting to True will deploy the Aggkit components and Sovereign contracts as well.
-    # Requires consensus_contract_type to be "pessimistic".
-    "deploy_optimism_rollup": True,
+    # Requires consensus_contract_type to be "pessimistic". 원래 True
+    "deploy_optimism_rollup": False,
     # After deploying OP Stack, upgrade it to OP Succinct.
     # Even mock-verifier deployments require an actual SPN network key.
     "deploy_op_succinct": False,
@@ -277,14 +277,15 @@ DEFAULT_L1_ARGS = {
     "use_previously_deployed_contracts": False,
     "erigon_datadir_archive": None,
     "anvil_state_file": None,
+    # 원래 다 False
     "mitm_proxied_components": {
-        "agglayer": False,
-        "aggkit": False,
-        "bridge": False,
-        "dac": False,
-        "erigon-sequencer": False,
-        "erigon-rpc": False,
-        "cdk-node": False,
+        "agglayer": True,
+        "aggkit": True,
+        "bridge": True,
+        "dac": True,
+        "erigon-sequencer": True,
+        "erigon-rpc": True,
+        "cdk-node": True,
     },
 }
 
